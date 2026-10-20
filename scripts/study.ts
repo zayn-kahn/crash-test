@@ -34,6 +34,8 @@ const { values: a } = parseArgs({
     player: { type: "string" },
     /** Another agent model on the same matrix (alias or id: gpt5mini, deepseek, qwen, gemma4, qwen9b, sonnet...). */
     model: { type: "string" },
+    /** First Anvil port (default: the study's basePort); lets two models run the same matrix side by side. */
+    "base-port": { type: "string" },
   },
 });
 if (!a.matrix) throw new Error("--matrix <name> is required (study/<name>.json)");
@@ -128,5 +130,5 @@ async function worker(port: number) {
     }
   }
 }
-await Promise.all(Array.from({ length: Math.min(def.parallel, left.length) }, (_, i) => worker(def.basePort + i)));
+await Promise.all(Array.from({ length: Math.min(def.parallel, left.length) }, (_, i) => worker((a["base-port"] ? Number(a["base-port"]) : def.basePort) + i)));
 console.log(`\nDone. Spent so far $${spentUsd().toFixed(2)}. Next: pnpm analyze --matrix ${def.name}${a.pilot ? " --pilot" : ""}${scripted ? ` --player ${a.player}` : ""}`);
