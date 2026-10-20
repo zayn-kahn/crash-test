@@ -44,6 +44,7 @@ function route() {
   window.clearInterval(poll);
   window.scrollTo(0, 0);
   const h = location.hash || "#/";
+  app.classList.toggle("wide", h.startsWith("#/scenarios")); // the runs table gets more room, still centred
   if (h.startsWith("#/run/")) void runPage(decodeURIComponent(h.slice(6)));
   else if (h.startsWith("#/scenarios")) void scenariosPage();
   else landing();

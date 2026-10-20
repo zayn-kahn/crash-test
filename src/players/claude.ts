@@ -58,7 +58,11 @@ export class ClaudeBackend implements AgentBackend {
   }
 
   /** One tool-free completion (used by the judge and the smoke test). */
-  async complete(o: { system: string; prompt: string; maxTokens?: number }): Promise<{ text: string; cost: number; usage: Usage; model: string }> {
+  async complete(o: {
+    system: string;
+    prompt: string;
+    maxTokens?: number;
+  }): Promise<{ text: string; cost: number; usage: Usage; model: string; stopReason: string | null; stopDetails: unknown }> {
     const res = await this.client.messages.create(
       {
         model: this.model,
@@ -70,7 +74,8 @@ export class ClaudeBackend implements AgentBackend {
       { timeout: this.opts.turnTimeoutMs ?? AGENT.turnTimeoutMs },
     );
     const text = res.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n");
-    return { text, cost: costUsd(this.model, res.usage), usage: res.usage, model: res.model };
+    const stopDetails = (res as unknown as { stop_details?: unknown }).stop_details ?? null;
+    return { text, cost: costUsd(this.model, res.usage), usage: res.usage, model: res.model, stopReason: res.stop_reason ?? null, stopDetails };
   }
 
   /**

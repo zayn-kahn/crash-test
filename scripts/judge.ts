@@ -5,10 +5,12 @@
  *   pnpm judge <id> [<id> ...]    these runs (re-judges)
  *   pnpm judge --study v1         every unjudged run of one study
  *   pnpm judge --show <id>        print exactly what the judge would read; calls nothing, costs nothing
+ *   --model <id>                  judge with another model (e.g. claude-sonnet-5-5 for runs the API filter stops on Haiku);
+ *                                 the verdict file records which model judged it
  */
 import { existsSync, readdirSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { MAX_USD } from "../src/config.js";
+import { MAX_USD, type ModelId } from "../src/config.js";
 import { isFinished, readRun } from "../src/analysis/evidence.js";
 import { judgeInput, judgeRun } from "../src/analysis/judge.js";
 import { RUNS_DIR } from "../src/paths.js";
@@ -16,7 +18,7 @@ import { isDryRun, spentUsd } from "../src/runs.js";
 
 const { values: a, positionals } = parseArgs({
   allowPositionals: true,
-  options: { show: { type: "string" }, study: { type: "string" } },
+  options: { show: { type: "string" }, study: { type: "string" }, model: { type: "string" } },
 });
 
 if (a.show) {
@@ -39,7 +41,7 @@ const ids = positionals.length
 let cost = 0;
 for (const id of ids) {
   if (spentUsd() >= MAX_USD) throw new Error(`spend guard: logged spend reached MAX_USD $${MAX_USD}`);
-  const r = await judgeRun(`${RUNS_DIR}/${id}.jsonl`);
+  const r = await judgeRun(`${RUNS_DIR}/${id}.jsonl`, (a.model as ModelId | undefined) ?? undefined);
   cost += r.costUsd;
   const v = r.verdict;
   console.log(

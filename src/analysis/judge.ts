@@ -32,6 +32,10 @@ export interface JudgeFile {
   verdict: Record<string, unknown> | null;
   error?: string;
   raw?: string;
+  /** On an error: why the API stopped ("refusal" = the API safety filter, "max_tokens", ...). */
+  stopReason?: string | null;
+  stopDetails?: unknown;
+  outputTokens?: number;
 }
 
 /** The exact text the judge gets for one run (also used by `pnpm judge --show`). */
@@ -58,6 +62,9 @@ export async function judgeRun(logPath: string, model: ModelId = JUDGE.model): P
   } catch (err) {
     out.error = `judge did not return a valid verdict (${(err as Error).message})`;
     out.raw = res.text.slice(0, 4000);
+    out.stopReason = res.stopReason;
+    out.stopDetails = res.stopDetails;
+    out.outputTokens = res.usage.output_tokens;
   }
   writeFileSync(logPath.replace(/\.jsonl$/, ".judge.json"), JSON.stringify(out, null, 2));
   return out;
