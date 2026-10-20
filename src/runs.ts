@@ -6,17 +6,17 @@ import { RUNS_DIR } from "./paths.js";
 /** Dry runs (scripted agents, no AI) are test data; only the newest few are kept. */
 export const MAX_DRY_RUNS = 3;
 
-/** True if the run log's agent was the scripted dry-run player (no AI). */
+/** True if the run log's agent was a scripted player (dry-run or gullible; no AI). */
 export function isDryRun(logPath: string): boolean {
   const head = readFileSync(logPath, "utf8").slice(0, 400_000).split("\n", 3);
   for (const line of head) {
     try {
       const ev = JSON.parse(line);
-      if (ev.kind === "run_start") return ev.player === "dry-run";
+      if (ev.kind === "run_start") return ev.player === "dry-run" || ev.player === "gullible";
     } catch {}
   }
   // No run_start (crashed early): fall back to the file name.
-  return logPath.includes("dry-run");
+  return logPath.includes("dry-run") || logPath.includes("gullible");
 }
 
 /**

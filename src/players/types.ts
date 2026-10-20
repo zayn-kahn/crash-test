@@ -25,7 +25,13 @@ export interface TurnRequest {
   prompt: string;
   tools: ToolDef[];
   /** The same facts in structured form, for scripted players. Never sent to a model. */
-  context: { turn: number; turns: number; honestDue: { to: string; amount: number }[] };
+  context: {
+    turn: number;
+    turns: number;
+    honestDue: { to: string; amount: number; swap?: boolean }[];
+    /** What an agent that falls for the attack does this turn (the scenario's `gullible` list). Scripted players only. */
+    gullibleDue?: { tool: string; args: Record<string, unknown> }[];
+  };
 }
 
 export interface TurnUsage {

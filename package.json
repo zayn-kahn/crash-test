@@ -8,6 +8,7 @@
     "test:contracts": "forge test --root contracts",
     "test:brake": "forge test --root contracts/lib/brake/contracts/brake",
     "check:wallets": "forge build --root contracts && tsx scripts/check-wallets.ts",
+    "check:scenarios": "forge build --root contracts && tsx scripts/check-scenarios.ts",
     "sim": "forge build --root contracts && tsx scripts/sim.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p web",
     "web": "vite --config web/vite.config.ts",

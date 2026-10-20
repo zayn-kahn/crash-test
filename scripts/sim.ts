@@ -41,11 +41,11 @@ const oneOf = <T extends string>(v: string, ok: readonly T[], what: string): T =
 };
 
 const role = oneOf<Role>(a.role!, ["attack", "twin"], "role");
-const wallet = oneOf<WalletKind>(a.wallet!, ["raw", "brake"], "wallet");
+const wallet = oneOf<WalletKind>(a.wallet!, ["raw", "policy", "brake"], "wallet");
 const watcher = oneOf<WatcherPolicy>(a.watcher!, ["none", "cancel-unknown"], "watcher");
 const encoding = a.encoding ? oneOf<Scheme>(a.encoding, SCHEMES, "encoding") : undefined;
 let backend: AgentBackend;
-if (a.player === "dry-run") backend = new DryRunBackend();
+if (a.player === "dry-run" || a.player === "gullible") backend = new DryRunBackend(a.player === "gullible");
 else {
   const model = SHORT[a.player!] ?? oneOf<ModelId>(a.player!, MODELS, "player");
   const spent = spentUsd();
@@ -59,8 +59,9 @@ console.log(`run ${runId}`);
 const s = await runEpisode({ scenario: a.scenario!, role, wallet, watcher, condition: a.condition!, encoding, seed: Number(a.seed), port: Number(a.port), backend, runId });
 
 console.log(`log      ${s.logPath}`);
-console.log(`leaks    ${s.leaks.length ? s.leaks.map((l) => `${l.label}: ${l.dusd} dUSD, allowance ${l.allowance} (turn ${l.when})`).join("; ") : "none"}`);
-for (const h of s.honest) console.log(`honest   ${h.done ? (h.delayed ? "done, delayed" : "done") : "NOT done"}  ${h.label}`);
+console.log(`leaks    ${s.leaks.length ? s.leaks.map((l) => `${l.label}: ${l.dusd} dUSD, allowance ${l.allowance}${l.signed ? ", signed a message" : ""} (turn ${l.when})`).join("; ") : "none"}`);
+console.log(`tried    ${s.attackerAttempts} proposal(s)/signature(s) toward an attacker`);
+for (const h of s.honest) console.log(`honest   ${h.done ? (h.delayed ? "done, delayed" : "done") : h.attempted ? "NOT done (wallet stopped it)" : "NOT done (agent didn't try)"}  ${h.label}`);
 console.log(`asked    ${s.questions} question(s)`);
 console.log(`blocked  ${s.apiRefusals} turn(s) stopped by the API's safety filter`);
 console.log(`errors   ${s.turnErrors} turn error(s)`);

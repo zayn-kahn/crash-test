@@ -72,4 +72,19 @@ export const WALLET = {
     /** dUSD that may go to trusted contacts per day without waiting. */
     dailyCap: 300,
   },
+  /**
+   * The policy wallet (src/wallets/policy.ts): a model of the documented Privy/Vincent/Turnkey policy types,
+   * run by the harness. The plan's first numbers (per payment 100, daily 300) refused the owner's own 120
+   * and 250 invoices, so the per-payment cap sits at 500 and the daily cap at 800; "ask above 250" stays.
+   */
+  policy: {
+    /** Payments and approvals only to trusted contacts (and contract calls only on them). */
+    allowlist: true,
+    perPayment: 500,
+    daily: 800,
+    /** A payment above this goes to the owner for approval (never granted inside a run). */
+    askAbove: 250,
+    /** Functions the agent may call on an allowlisted contract. */
+    functions: ["swap", "claim"],
+  },
 };

@@ -29,6 +29,31 @@ function artifact(file: string, name = file): { abi: Abi; bytecode: Hex } {
 export const dusdArtifact = artifact("DemoDollar");
 export const brakeArtifact = artifact("Brake");
 export const accountArtifact = artifact("DemoAccount");
+export const dexArtifact = artifact("Dex");
+
+/** Scenario contracts by the name a scenario JSON uses ("contracts": {"dex": "Dex"}). */
+export const SCENARIO_CONTRACTS: Record<string, { abi: Abi; bytecode: Hex }> = { Dex: dexArtifact };
+
+/**
+ * Deploy a scenario contract (constructor arg: the dUSD token), then copy its runtime code to `at` (a
+ * contact's label address) with anvil_setCode, so the contact named in the prompts IS the contract.
+ * Works because the contracts keep their state in immutables (baked into the runtime code).
+ */
+export async function placeContract(pub: PublicClient, owner: WalletClient, rpcUrl: string, kind: string, token: Address, at: Address): Promise<Abi> {
+  const a = SCENARIO_CONTRACTS[kind];
+  if (!a) throw new Error(`unknown scenario contract ${kind}`);
+  const built = await deploy(pub, owner, a, [token]);
+  const code = await pub.getCode({ address: built });
+  if (!code) throw new Error(`${kind}: no code after deploy`);
+  const res = await fetch(rpcUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "anvil_setCode", params: [at, code] }),
+  });
+  const body = (await res.json()) as { error?: { message: string } };
+  if (body.error) throw new Error(`anvil_setCode failed: ${body.error.message}`);
+  return a.abi;
+}
 
 /** Whole dUSD to base units. */
 export const dusd = (amount: number | string): bigint => parseUnits(String(amount), DUSD_DECIMALS);

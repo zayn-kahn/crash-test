@@ -9,6 +9,7 @@ import { dusd, dusdArtifact } from "../chain/deploy.js";
 import type { JsonlLogger } from "../log.js";
 import { defineTool, type ToolDef } from "../players/types.js";
 import type { Scenario } from "../scenarios/load.js";
+import { toolResult } from "../scenarios/load.js";
 import type { Outcome, Proposal, WalletAdapter } from "../wallets/types.js";
 import type { World } from "./world.js";
 
@@ -67,6 +68,43 @@ function outcomeText(o: Outcome): string {
 }
 
 export function makeTools(ctx: ToolContext): ToolDef[] {
+  return [...withIntercepts(ctx, builtInTools(ctx)), ...scenarioTools(ctx)];
+}
+
+/** The scenario's own tools (e.g. the treasury desk's "MCP" tool): the answer is whatever the scenario wrote for this turn. */
+function scenarioTools(ctx: ToolContext): ToolDef[] {
+  return ctx.scenario.tools.map((t) =>
+    defineTool({
+      name: t.name,
+      description: t.description,
+      parameters: z.object({}),
+      handler: async () => toolResult(t, ctx.turn),
+    }),
+  );
+}
+
+/** A built-in tool whose answer the scenario replaces this turn: the call does not run; the agent reads the scenario's text. */
+function withIntercepts(ctx: ToolContext, tools: ToolDef[]): ToolDef[] {
+  const now = ctx.scenario.intercepts.filter((x) => x.turn === ctx.turn);
+  if (!now.length) return tools;
+  return tools.map((t) => {
+    const x = now.find((i) => i.tool === t.name);
+    if (!x) return t;
+    let used = 0;
+    return {
+      ...t,
+      handler: async (args) => {
+        if (used >= x.times) return t.handler(args);
+        used++;
+        ctx.logger.log({ agent: "harness", kind: "intercept", turn: ctx.turn, tool: t.name, args, text: x.text });
+        ctx.world.act(ctx.turn, `${t.name}: error returned`);
+        return x.text;
+      },
+    };
+  });
+}
+
+function builtInTools(ctx: ToolContext): ToolDef[] {
   const { scenario: s, world, wallet, turn, logger } = ctx;
   const d = (name: string) => {
     const text = ctx.descriptions[name];
@@ -79,6 +117,7 @@ export function makeTools(ctx: ToolContext): ToolDef[] {
   const propose = async (p: Proposal, what: string): Promise<string> => {
     const outcome = await wallet.propose(p);
     logger.log({ agent: "harness", kind: "proposal", turn, p, outcome });
+    world.proposals.push({ turn, p, outcome });
     if (outcome.status === "queued") world.pending.push({ opId: outcome.opId, summary: what });
     const line = `${what}: ${outcomeText(outcome)}`;
     world.act(turn, line);
@@ -152,8 +191,10 @@ export function makeTools(ctx: ToolContext): ToolDef[] {
         if (fn.inputs.length !== a.args.length) return `"${a.function}" takes ${fn.inputs.length} argument(s).`;
         const args: unknown[] = [];
         for (const [i, inp] of fn.inputs.entries()) {
-          if (inp.type.startsWith("uint")) args.push(BigInt(a.args[i]));
-          else if (inp.type === "address") {
+          if (inp.type.startsWith("uint")) {
+            if (!/^\d+$/.test(a.args[i].trim())) return `Argument ${i + 1} of "${a.function}" must be a whole number.`;
+            args.push(BigInt(a.args[i].trim()));
+          } else if (inp.type === "address") {
             const t = resolveTarget(s, a.args[i]);
             if ("error" in t) return t.error;
             args.push(t.address);

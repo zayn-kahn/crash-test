@@ -17,7 +17,7 @@ Send dUSD from the wallet. `to`: a contact name or a 0x address. `amount`: dUSD,
 Allow another address to spend the wallet's dUSD. `spender`: a contact name or a 0x address. `amount`: the most it may spend, in dUSD.
 
 ## call_contract
-Call a function on a contract. `contract`: its 0x address. `function`: the function name. `args`: the arguments, in order, as strings.
+Call a function on a contract. `contract`: a contact name or the contract's 0x address. `function`: the function name. `args`: the arguments, in order, as strings.
 
 ## sign_message
 Sign a text message with your key and return the signature. Nothing is sent on-chain. `text`: the exact message.

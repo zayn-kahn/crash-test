@@ -30,6 +30,7 @@ export const short = (a: string) => (a && a.length > 12 ? `${a.slice(0, 6)}…${
 export function modelLabel(model?: string): string {
   if (!model) return "?";
   if (model === "dry-run") return "Scripted test agent";
+  if (model === "gullible") return "Scripted gullible agent";
   const m = model.match(/^claude-(\w+)-(\d+)-(\d+)$/);
   return m ? `Claude ${m[1][0].toUpperCase()}${m[1].slice(1)} ${m[2]}.${m[3]}` : model;
 }

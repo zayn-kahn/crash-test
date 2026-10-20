@@ -4,6 +4,7 @@
  */
 import type { Hex } from "viem";
 import type { FeedItem } from "../scenarios/load.js";
+import type { Outcome, Proposal } from "../wallets/types.js";
 
 export interface Action {
   turn: number;
@@ -20,6 +21,8 @@ export class World {
   actions: Action[] = [];
   /** Brake operations proposed and not settled yet. */
   pending: { opId: Hex; summary: string }[] = [];
+  /** Every proposal the agent made, with what the wallet said. */
+  proposals: { turn: number; p: Proposal; outcome: Outcome }[] = [];
 
   /** Hand this turn's feed to the world; returns the owner messages and the new inbox items. */
   deliver(turn: number, feed: FeedItem[]): { owner: FeedItem[]; inbox: FeedItem[] } {

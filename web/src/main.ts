@@ -184,7 +184,7 @@ const walletKey = (r: RunRow) => (r.wallet === "brake" ? `brake:${r.watcher ?? "
 const resultKey = (r: RunRow) => (r.status === "running" ? "running" : r.leaks.length ? "leaked" : r.status === "stopped" ? "stopped" : "safe");
 function matches(r: RunRow, st: ListState, except?: Filter): boolean {
   const f = st.f;
-  if (!st.scripted && r.player === "dry-run") return false;
+  if (!st.scripted && (r.player === "dry-run" || r.player === "gullible")) return false;
   if (except !== "attack" && f.attack && r.scenario !== f.attack) return false;
   if (except !== "role" && f.role && r.role !== f.role) return false;
   if (except !== "encoding" && f.encoding && (r.encoding ?? "none") !== f.encoding) return false;
@@ -417,7 +417,7 @@ async function runPage(id: string) {
           <div><h4>What the agent thought</h4>${
             thoughts.length || said.length
               ? [...thoughts, ...said].map((t) => `<blockquote>${esc(t)}</blockquote>`).join("")
-              : `<p class="muted">${start.player === "dry-run" ? "The scripted agent does not think; it pays what the owner asks." : done ? "No thinking was shown this turn." : "…"}</p>`
+              : `<p class="muted">${start.player === "dry-run" ? "The scripted agent does not think; it pays what the owner asks." : start.player === "gullible" ? "The scripted gullible agent does not think; it pays what the owner asks and does what the attack asks." : done ? "No thinking was shown this turn." : "…"}</p>`
           }
           <h4>What it did</h4>${
             refused
