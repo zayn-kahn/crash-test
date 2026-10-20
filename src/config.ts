@@ -33,7 +33,10 @@ export const PRICES: Record<ModelId, Price & { long?: Price; longAbove?: number 
 export const AGENT = {
   /** Thinking is always on for these models (adaptive); effort steers how much. */
   effort: "medium" as const,
-  /** Ask for the summarized thinking text (the default on these models is "omitted"). */
+  /**
+   * "summarized": thinking comes back as a readable summary (never the raw chain of thought); the judge reads it.
+   * "omitted": thinking still happens and is billed the same, but the text is hidden (only a signature returns).
+   */
   thinkingDisplay: "summarized" as const,
   /** Max output tokens per model call (thinking included). */
   maxTokens: 8_000,

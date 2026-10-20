@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#444"/></marker></defs>
+<rect x="0" y="0" width="1120" height="720" fill="#ffffff"/>
+<text x="24" y="34" font-size="20" font-weight="bold" fill="#222">2. What each wallet does with the agent's proposal</text>
+<rect x="385" y="60" width="350" height="70" rx="10" fill="#f1e8ff" stroke="#7a4fd1" stroke-width="2"/>
+<text x="560.0" y="91.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Agent's proposal</text>
+<text x="560.0" y="111.5" font-size="12.5" fill="#333" text-anchor="middle">pay, approve or contract call</text>
+<rect x="40" y="190" width="310" height="64" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="195.0" y="227.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Raw key</text>
+<path d="M560,130 L560,160 L195.0,160 L195.0,190" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="405" y="190" width="310" height="64" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="560.0" y="227.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Policy wallet</text>
+<path d="M560,130 L560,160 L560.0,160 L560.0,190" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="770" y="190" width="310" height="64" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="925.0" y="227.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Brake (ERC-7579 module)</text>
+<path d="M560,130 L560,160 L925.0,160 L925.0,190" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="40" y="300" width="310" height="70" rx="10" fill="#fde7e7" stroke="#c43c3c" stroke-width="2"/>
+<text x="195.0" y="331.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Sent at once</text>
+<text x="195.0" y="351.5" font-size="12.5" fill="#333" text-anchor="middle">no checks of any kind</text>
+<path d="M195,254 L195,300" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="405" y="300" width="310" height="150" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
+<text x="560.0" y="337.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Checks</text>
+<text x="560.0" y="357.5" font-size="12.5" fill="#333" text-anchor="middle">per payment up to 100 dUSD</text>
+<text x="560.0" y="374.5" font-size="12.5" fill="#333" text-anchor="middle">up to 300 dUSD a day</text>
+<text x="560.0" y="391.5" font-size="12.5" fill="#333" text-anchor="middle">only contacts + dex</text>
+<text x="560.0" y="408.5" font-size="12.5" fill="#333" text-anchor="middle">only allowed functions</text>
+<text x="560.0" y="425.5" font-size="12.5" fill="#333" text-anchor="middle">ask a human above 250</text>
+<path d="M560,254 L560,300" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="405" y="510" width="96" height="54" rx="10" fill="#e3f7ec" stroke="#1f8a50" stroke-width="2"/>
+<text x="453.0" y="542.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">sent</text>
+<path d="M560,450 L560,480 L453.0,480 L453.0,510" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="512" y="510" width="96" height="54" rx="10" fill="#fde7e7" stroke="#c43c3c" stroke-width="2"/>
+<text x="560.0" y="542.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">refused</text>
+<path d="M560,450 L560,480 L560.0,480 L560.0,510" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="619" y="510" width="96" height="54" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
+<text x="667.0" y="542.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">to human</text>
+<path d="M560,450 L560,480 L667.0,480 L667.0,510" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="770" y="300" width="310" height="70" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
+<text x="925.0" y="331.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Trusted contact, under cap?</text>
+<text x="925.0" y="351.5" font-size="12.5" fill="#333" text-anchor="middle">daily cap 300 dUSD</text>
+<path d="M925,254 L925,300" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="770" y="420" width="120" height="54" rx="10" fill="#e3f7ec" stroke="#1f8a50" stroke-width="2"/>
+<text x="830.0" y="452.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">sent now</text>
+<path d="M830,370 L830,420" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="814.56" y="386" width="30.88" height="18" fill="#ffffff"/>
+<text x="830" y="399" font-size="12" fill="#444" text-anchor="middle" font-style="italic">yes</text>
+<rect x="930" y="420" width="150" height="70" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="1005.0" y="443.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">queued 1 hour</text>
+<text x="1005.0" y="463.0" font-size="12.5" fill="#333" text-anchor="middle">owner or watcher</text>
+<text x="1005.0" y="480.0" font-size="12.5" fill="#333" text-anchor="middle">can cancel</text>
+<path d="M1005,370 L1005,420" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="993.04" y="386" width="23.919999999999998" height="18" fill="#ffffff"/>
+<text x="1005" y="399" font-size="12" fill="#444" text-anchor="middle" font-style="italic">no</text>
+<rect x="930" y="530" width="150" height="70" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
+<text x="1005.0" y="553.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Watcher</text>
+<text x="1005.0" y="573.0" font-size="12.5" fill="#333" text-anchor="middle">none or</text>
+<text x="1005.0" y="590.0" font-size="12.5" fill="#333" text-anchor="middle">cancel-unknown</text>
+<path d="M1005,490 L1005,530" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="770" y="630" width="150" height="54" rx="10" fill="#e3f7ec" stroke="#1f8a50" stroke-width="2"/>
+<text x="845.0" y="653.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">cancelled</text>
+<text x="845.0" y="673.5" font-size="12.5" fill="#333" text-anchor="middle">= stopped</text>
+<rect x="940" y="630" width="160" height="54" rx="10" fill="#fde7e7" stroke="#c43c3c" stroke-width="2"/>
+<text x="1020.0" y="653.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">executed</text>
+<text x="1020.0" y="673.5" font-size="12.5" fill="#333" text-anchor="middle">= leak, delayed</text>
+<path d="M1005,600 L1005,615 L845,615 L845,630" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<path d="M1020,600 L1020,630" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+</svg>

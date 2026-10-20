@@ -7,7 +7,8 @@ Six attacks copied from 2026 incidents ([docs/attacks.md](docs/attacks.md)), eac
 run against three wallets (a raw key, a policy wallet, Brake) on a private local chain. The chain decides
 what leaked; a blind judge reads what the agent noticed and said.
 
-Status: Phase 0 (setup). The plan lives outside this folder, in `../ideas/crash-test-memory.md`.
+Status: Phase 0 (setup) done. How it fits together: [docs/architecture.md](docs/architecture.md). The plan
+lives outside this folder, in `../ideas/crash-test-memory.md`.
 
 ## Setup
 

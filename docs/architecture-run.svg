@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="640" viewBox="0 0 1120 640" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#444"/></marker></defs>
+<rect x="0" y="0" width="1120" height="640" fill="#ffffff"/>
+<text x="24" y="34" font-size="20" font-weight="bold" fill="#222">1. One run: 6 turns, one agent, one wallet</text>
+<rect x="30" y="70" width="230" height="96" rx="10" fill="#e7f0ff" stroke="#3b6fd8" stroke-width="2"/>
+<text x="145.0" y="106.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Scenario feed</text>
+<text x="145.0" y="126.0" font-size="12.5" fill="#333" text-anchor="middle">attack or innocent twin</text>
+<text x="145.0" y="143.0" font-size="12.5" fill="#333" text-anchor="middle">one of 6 incidents</text>
+<rect x="310" y="70" width="230" height="96" rx="10" fill="#e7f0ff" stroke="#3b6fd8" stroke-width="2"/>
+<text x="425.0" y="106.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Turn message</text>
+<text x="425.0" y="126.0" font-size="12.5" fill="#333" text-anchor="middle">owner channel = orders</text>
+<text x="425.0" y="143.0" font-size="12.5" fill="#333" text-anchor="middle">inbox, pages, tools = data</text>
+<rect x="590" y="70" width="230" height="96" rx="10" fill="#f1e8ff" stroke="#7a4fd1" stroke-width="2"/>
+<text x="705.0" y="106.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Agent under test</text>
+<text x="705.0" y="126.0" font-size="12.5" fill="#333" text-anchor="middle">Claude Haiku 5.5 / Sonnet 5.5</text>
+<text x="705.0" y="143.0" font-size="12.5" fill="#333" text-anchor="middle">fresh session each turn</text>
+<rect x="860" y="70" width="230" height="96" rx="10" fill="#f1e8ff" stroke="#7a4fd1" stroke-width="2"/>
+<text x="975.0" y="106.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Agent tools</text>
+<text x="975.0" y="126.0" font-size="12.5" fill="#333" text-anchor="middle">pay, approve, call, sign</text>
+<text x="975.0" y="143.0" font-size="12.5" fill="#333" text-anchor="middle">remember, ask_human, end_turn</text>
+<rect x="860" y="290" width="230" height="96" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="975.0" y="326.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Wallet under test</text>
+<text x="975.0" y="346.0" font-size="12.5" fill="#333" text-anchor="middle">raw, policy or Brake</text>
+<text x="975.0" y="363.0" font-size="12.5" fill="#333" text-anchor="middle">sent / queued / refused</text>
+<rect x="590" y="290" width="230" height="96" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="705.0" y="326.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Anvil chain</text>
+<text x="705.0" y="346.0" font-size="12.5" fill="#333" text-anchor="middle">private, chain id 31337</text>
+<text x="705.0" y="363.0" font-size="12.5" fill="#333" text-anchor="middle">dUSD + scenario contracts</text>
+<rect x="310" y="290" width="230" height="96" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
+<text x="425.0" y="326.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Oracle</text>
+<text x="425.0" y="346.0" font-size="12.5" fill="#333" text-anchor="middle">balance + allowance diffs</text>
+<text x="425.0" y="363.0" font-size="12.5" fill="#333" text-anchor="middle">leak = money to attacker</text>
+<rect x="30" y="290" width="230" height="96" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
+<text x="145.0" y="326.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Run log</text>
+<text x="145.0" y="346.0" font-size="12.5" fill="#333" text-anchor="middle">data/runs/&lt;id&gt;.jsonl</text>
+<text x="145.0" y="363.0" font-size="12.5" fill="#333" text-anchor="middle">every event, in order</text>
+<rect x="30" y="500" width="230" height="96" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
+<text x="145.0" y="536.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Brake settle</text>
+<text x="145.0" y="556.0" font-size="12.5" fill="#333" text-anchor="middle">skip the wait in time</text>
+<text x="145.0" y="573.0" font-size="12.5" fill="#333" text-anchor="middle">watcher acts, rest runs</text>
+<rect x="310" y="500" width="230" height="96" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
+<text x="425.0" y="536.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Blind judge</text>
+<text x="425.0" y="556.0" font-size="12.5" fill="#333" text-anchor="middle">reads feed + agent record</text>
+<text x="425.0" y="573.0" font-size="12.5" fill="#333" text-anchor="middle">never told attack or twin</text>
+<rect x="590" y="500" width="230" height="96" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
+<text x="705.0" y="536.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Scorecard row</text>
+<text x="705.0" y="556.0" font-size="12.5" fill="#333" text-anchor="middle">leaks, false refusals</text>
+<text x="705.0" y="573.0" font-size="12.5" fill="#333" text-anchor="middle">cost in USD</text>
+<path d="M260,118.0 L310,118.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<path d="M540,118.0 L590,118.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<path d="M820,118.0 L860,118.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<path d="M975.0,166 L975.0,290" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="942.16" y="215" width="65.67999999999999" height="18" fill="#ffffff"/>
+<text x="975.0" y="228" font-size="12" fill="#444" text-anchor="middle" font-style="italic">proposal</text>
+<path d="M860,338.0 L820,338.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="823.04" y="317.0" width="23.919999999999998" height="18" fill="#ffffff"/>
+<text x="835" y="330.0" font-size="12" fill="#444" text-anchor="middle" font-style="italic">tx</text>
+<path d="M590,338.0 L540,338.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="542.6" y="317.0" width="44.8" height="18" fill="#ffffff"/>
+<text x="565" y="330.0" font-size="12" fill="#444" text-anchor="middle" font-style="italic">state</text>
+<path d="M310,338.0 L260,338.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<path d="M425.0,290 L425.0,166" fill="none" stroke="#444" stroke-width="2" stroke-dasharray="6,5" marker-end="url(#a)"/>
+<rect x="364.32" y="215" width="121.35999999999999" height="18" fill="#ffffff"/>
+<text x="425.0" y="228" font-size="12" fill="#444" text-anchor="middle" font-style="italic">next turn (1..6)</text>
+<path d="M145.0,386 L145.0,500" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<rect x="98.24000000000001" y="423" width="93.52" height="18" fill="#ffffff"/>
+<text x="145.0" y="436" font-size="12" fill="#444" text-anchor="middle" font-style="italic">after turn 6</text>
+<path d="M260,548.0 L310,548.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<path d="M540,548.0 L590,548.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
+<text x="860" y="520" font-size="13" fill="#222" text-anchor="start" font-weight="bold">Colours</text>
+<rect x="860" y="530" width="14" height="12" fill="#e7f0ff" stroke="#3b6fd8"/>
+<text x="882" y="541" font-size="12" fill="#555" text-anchor="start">what the agent reads</text>
+<rect x="860" y="548" width="14" height="12" fill="#f1e8ff" stroke="#7a4fd1"/>
+<text x="882" y="559" font-size="12" fill="#555" text-anchor="start">the model and its tools</text>
+<rect x="860" y="566" width="14" height="12" fill="#e6f6ea" stroke="#2f8a4c"/>
+<text x="882" y="577" font-size="12" fill="#555" text-anchor="start">wallet and chain</text>
+<rect x="860" y="584" width="14" height="12" fill="#fff4e0" stroke="#c98a1b"/>
+<text x="882" y="595" font-size="12" fill="#555" text-anchor="start">how we score</text>
+<rect x="860" y="602" width="14" height="12" fill="#f2f2f2" stroke="#666666"/>
+<text x="882" y="613" font-size="12" fill="#555" text-anchor="start">what we keep</text>
+</svg>
