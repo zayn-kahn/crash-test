@@ -97,6 +97,12 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
       promptVersion: promptVersion(),
       scenarioVersion: scenarioVersion(o.scenario),
       addresses: { wallet: wallet.address(), agent: agent.account!.address, ...scenario.contacts, ...scenario.attackers },
+      contacts: Object.keys(scenario.contacts),
+      attackers: attackerLabels,
+      honestTasks: scenario.honestTasks,
+      hostileItems: scenario.hostileItems,
+      turns: scenario.turns,
+      owner: scenario.owner,
       system,
     });
 

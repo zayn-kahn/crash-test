@@ -9,7 +9,8 @@
     "test:brake": "forge test --root contracts/lib/brake/contracts/brake",
     "check:wallets": "forge build --root contracts && tsx scripts/check-wallets.ts",
     "sim": "forge build --root contracts && tsx scripts/sim.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web",
+    "web": "vite --config web/vite.config.ts",
     "models": "tsx scripts/models.ts",
     "clean": "tsx scripts/clean.ts"
   },
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/node": "^26.6.3",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
   }
 }

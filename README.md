@@ -14,7 +14,12 @@ lives outside this folder, in `../ideas/crash-test-memory.md`.
 ```sh
 pnpm sim --scenario grok --role attack --wallet raw --player dry-run          # free, scripted agent
 pnpm sim --scenario grok --role attack --wallet brake --watcher cancel-unknown --player haiku --seed 1
+pnpm web                                                                       # viewer: http://127.0.0.1:5173
 ```
+
+The viewer (`web/`, Vite, no framework) explains the project, lists every scenario and every run in
+`data/runs/`, and replays a run turn by turn: what arrived, what the agent thought and did, what moved on
+the chain. A run in progress shows up on its own and updates every 2 seconds.
 
 ## Setup
 
