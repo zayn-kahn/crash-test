@@ -17,3 +17,15 @@ export function apiSettingsFromDotEnv(path = ".env"): ApiSettings {
   if (!env.ANTHROPIC_API_KEY) throw new Error(`ANTHROPIC_API_KEY is empty in ${path}`);
   return { apiKey: env.ANTHROPIC_API_KEY, workspaceId: env.ANTHROPIC_WORKSPACE_ID || undefined };
 }
+
+/**
+ * The OpenRouter key (OPENROUTER_API_KEY), from this folder's .env only. Optional for the project: it is read
+ * only when an OpenRouter model is used, so Claude-only runs need nothing new in .env.
+ */
+export function openRouterKeyFromDotEnv(path = ".env"): string {
+  if (!existsSync(path)) throw new Error(`${path} not found: copy .env.example to .env and add OPENROUTER_API_KEY`);
+  const env = parseEnv(readFileSync(path, "utf8"));
+  const key = env.OPENROUTER_API_KEY;
+  if (!key) throw new Error(`OPENROUTER_API_KEY is empty in ${path} (needed for OpenRouter models only)`);
+  return key;
+}

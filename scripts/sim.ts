@@ -4,7 +4,7 @@
  *   pnpm sim --scenario grok --role twin --wallet raw --player dry-run
  *   pnpm sim --scenario grok --role attack --wallet brake --watcher cancel-unknown --player haiku --seed 1
  *
- * --player: dry-run (free, scripted) | haiku | sonnet | a full model id from src/config.ts.
+ * --player: dry-run | gullible (free, scripted) | haiku | sonnet | a Claude id | an OpenRouter alias (gpt5mini, deepseek, qwen, gemma4, qwen9b).
  * --encoding: plain | morse | base64 | zero-width, overrides how the scenario's hidden line is written.
  * --instructions: owner-only | public-requests, overrides where the agent takes instructions from.
  * --trust-root: contacts (default) | notes: where the agent learns who is who (contact list vs its notes + get_history).
@@ -12,9 +12,9 @@
  * Model runs are refused once the spend logged in data/runs/ reaches MAX_USD.
  */
 import { parseArgs } from "node:util";
-import { MAX_USD, MODELS, type ModelId } from "../src/config.js";
+import { MAX_USD } from "../src/config.js";
 import { runEpisode } from "../src/game/run.js";
-import { ClaudeBackend } from "../src/players/claude.js";
+import { backendFor, modelTag } from "../src/players/backend.js";
 import { DryRunBackend } from "../src/players/dry-run.js";
 import type { AgentBackend } from "../src/players/types.js";
 import type { TrustRoot, WalletKind } from "../src/prompts.js";
@@ -39,7 +39,6 @@ const { values: a } = parseArgs({
   },
 });
 
-const SHORT: Record<string, ModelId> = { haiku: "claude-haiku-5-5", sonnet: "claude-sonnet-5-5" };
 const oneOf = <T extends string>(v: string, ok: readonly T[], what: string): T => {
   if (!ok.includes(v as T)) throw new Error(`--${what} must be one of: ${ok.join(", ")}`);
   return v as T;
@@ -52,14 +51,13 @@ const encoding = a.encoding ? oneOf<Scheme>(a.encoding, SCHEMES, "encoding") : u
 let backend: AgentBackend;
 if (a.player === "dry-run" || a.player === "gullible") backend = new DryRunBackend(a.player === "gullible");
 else {
-  const model = SHORT[a.player!] ?? oneOf<ModelId>(a.player!, MODELS, "player");
   const spent = spentUsd();
   if (spent >= MAX_USD) throw new Error(`spend guard: $${spent.toFixed(2)} logged in data/runs/ >= MAX_USD $${MAX_USD} (src/config.ts)`);
-  backend = new ClaudeBackend({ model });
+  backend = backendFor(a.player!); // haiku | sonnet | a Claude id | an OpenRouter alias or id (src/players/openrouter-models.ts)
 }
 
 const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
-const runId = `${a.scenario}${encoding ? `-${encoding}` : ""}${a.instructions ? `-${a.instructions}` : ""}${a["trust-root"] ? `-${a["trust-root"]}` : ""}-${role}-${wallet}${wallet === "brake" ? `-${watcher}` : ""}-${backend.model}-s${a.seed}-${stamp}`;
+const runId = `${a.scenario}${encoding ? `-${encoding}` : ""}${a.instructions ? `-${a.instructions}` : ""}${a["trust-root"] ? `-${a["trust-root"]}` : ""}-${role}-${wallet}${wallet === "brake" ? `-${watcher}` : ""}-${a.player === "dry-run" || a.player === "gullible" ? backend.model : modelTag(a.player!)}-s${a.seed}-${stamp}`;
 console.log(`run ${runId}`);
 const s = await runEpisode({ scenario: a.scenario!, role, wallet, watcher, condition: a.condition!, instructions: a.instructions, trustRoot: a["trust-root"] as TrustRoot | undefined, encoding, seed: Number(a.seed), port: Number(a.port), backend, runId });
 

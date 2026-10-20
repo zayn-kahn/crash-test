@@ -13,21 +13,26 @@ import { parseArgs } from "node:util";
 import { readRun } from "../src/analysis/evidence.js";
 import { block, judgeSummary, markdown, runRow, type RunRow } from "../src/analysis/scorecard.js";
 import { LABELS_DIR, RUNS_DIR } from "../src/paths.js";
+import { modelTag } from "../src/players/backend.js";
 import { cellRunId, cells, loadStudy } from "../src/study.js";
 
-const { values: a } = parseArgs({ options: { matrix: { type: "string" }, pilot: { type: "boolean", default: false }, player: { type: "string" } } });
+const { values: a } = parseArgs({
+  options: { matrix: { type: "string" }, pilot: { type: "boolean", default: false }, player: { type: "string" }, model: { type: "string" } },
+});
 if (!a.matrix) throw new Error("--matrix <name> is required");
 const def = loadStudy(a.matrix);
-const tag = a.pilot ? `${def.name}-pilot` : def.name;
+const runTag = a.pilot ? `${def.name}-pilot` : def.name; // the run ids' prefix
+// Another agent model on the same matrix (pnpm study --model X) gets its own results file.
+const tag = a.model ? `${runTag}-${modelTag(a.model)}` : runTag;
 const scripted = !!a.player;
-const model = a.player ?? def.model;
-const dir = scripted ? `.tmp/study-${tag}-${a.player}` : RUNS_DIR;
+const model = a.player ?? modelTag(a.model ?? def.model);
+const dir = scripted ? `.tmp/study-${runTag}-${a.player}` : RUNS_DIR;
 
 const rows: RunRow[] = [];
 const excluded: string[] = [];
 let missing = 0;
 for (const c of cells(def, a.pilot)) {
-  const path = `${dir}/${cellRunId(tag, model, c)}.jsonl`;
+  const path = `${dir}/${cellRunId(runTag, model, c)}.jsonl`;
   if (!existsSync(path)) {
     missing++;
     continue;
@@ -63,11 +68,11 @@ const header = [
 ].join("\n");
 // The wallet-alone ceiling: the same cells played by the scripted gullible player, if that rehearsal exists
 // (pnpm study --matrix <name> [--pilot] --player gullible). Not a model result; shown as one labelled row.
-const ceilingDir = `.tmp/study-${tag}-gullible`;
+const ceilingDir = `.tmp/study-${runTag}-gullible`;
 const ceiling =
   !scripted && existsSync(ceilingDir)
     ? cells(def, a.pilot).flatMap((c) => {
-        const p = `${ceilingDir}/${cellRunId(tag, "gullible", c)}.jsonl`;
+        const p = `${ceilingDir}/${cellRunId(runTag, "gullible", c)}.jsonl`;
         const r = existsSync(p) ? runRow(p) : null;
         return r && r.role === "attack" ? [r] : [];
       })

@@ -19,7 +19,7 @@ import { isFinished, readRun } from "../src/analysis/evidence.js";
 import { judgeRun } from "../src/analysis/judge.js";
 import { runEpisode } from "../src/game/run.js";
 import { RUNS_DIR } from "../src/paths.js";
-import { ClaudeBackend } from "../src/players/claude.js";
+import { backendFor, modelTag, resolveModel } from "../src/players/backend.js";
 import { DryRunBackend } from "../src/players/dry-run.js";
 import { judgeVersion, promptVersion, scenarioVersion } from "../src/prompts.js";
 import { isDryRun, spentUsd } from "../src/runs.js";
@@ -32,6 +32,8 @@ const { values: a } = parseArgs({
     pilot: { type: "boolean", default: false },
     freeze: { type: "boolean", default: false },
     player: { type: "string" },
+    /** Another agent model on the same matrix (alias or id: gpt5mini, deepseek, qwen, gemma4, qwen9b, sonnet...). */
+    model: { type: "string" },
   },
 });
 if (!a.matrix) throw new Error("--matrix <name> is required (study/<name>.json)");
@@ -53,7 +55,10 @@ if (a.freeze) {
 }
 
 const tag = a.pilot ? `${def.name}-pilot` : def.name;
-const model = scripted ? a.player! : def.model;
+const agentModel = a.model ? resolveModel(a.model)?.id : def.model;
+if (!agentModel) throw new Error(`unknown --model ${a.model}`);
+// Run ids use a short tag (OpenRouter ids contain "/"); Claude ids are unchanged, so v1/v2 ids stay the same.
+const model = scripted ? a.player! : modelTag(agentModel);
 const logDir = scripted ? `.tmp/study-${tag}-${a.player}` : RUNS_DIR;
 const todo: Cell[] = cells(def, a.pilot);
 const idOf = (c: Cell) => cellRunId(tag, model, c);
@@ -69,7 +74,7 @@ const perRun = (() => {
     const p = `${RUNS_DIR}/${f}`;
     if (isDryRun(p)) continue;
     const L = readRun(p);
-    if (!isFinished(L) || L.find((e) => e.kind === "run_start")?.model !== def.model) continue;
+    if (!isFinished(L) || L.find((e) => e.kind === "run_start")?.model !== agentModel) continue;
     costs.push(L.filter((e) => e.kind === "turn_usage").reduce((s, e) => s + Number(e.cost ?? 0), 0));
     secs.push((Date.parse(L[L.length - 1].ts) - Date.parse(L[0].ts)) / 1000);
   }
@@ -85,7 +90,7 @@ console.log(
 console.log(`  prompts    ${now.promptVersion}, judge ${now.judgeVersion}${def.frozen ? (JSON.stringify(def.frozen) === JSON.stringify(now) ? " (match the frozen versions)" : " (DIFFER from the frozen versions)") : " (not frozen yet)"}`);
 if (!scripted && perRun)
   console.log(
-    `  estimate   runs ~$${(left.length * perRun.mean).toFixed(2)} (mean $${perRun.mean.toFixed(4)}/run over ${perRun.n} past ${def.model} runs) + judge; ~${Math.ceil((left.length * perRun.secs) / def.parallel / 60)} min at ${def.parallel} at a time; spent so far $${spentUsd().toFixed(2)} of MAX_USD $${MAX_USD}`,
+    `  estimate   runs ~$${(left.length * perRun.mean).toFixed(2)} (mean $${perRun.mean.toFixed(4)}/run over ${perRun.n} past ${agentModel} runs) + judge; ~${Math.ceil((left.length * perRun.secs) / def.parallel / 60)} min at ${def.parallel} at a time; spent so far $${spentUsd().toFixed(2)} of MAX_USD $${MAX_USD}`,
   );
 else if (!scripted) console.log(`  estimate   no past runs on this model to estimate from; spent so far $${spentUsd().toFixed(2)} of MAX_USD $${MAX_USD}`);
 if (a.plan) process.exit(0);
@@ -108,7 +113,7 @@ async function worker(port: number) {
       next = left.length;
       return;
     }
-    const backend = scripted ? new DryRunBackend(a.player === "gullible") : new ClaudeBackend({ model: def.model });
+    const backend = scripted ? new DryRunBackend(a.player === "gullible") : backendFor(agentModel!);
     try {
       const s = await runEpisode({ ...c, condition: def.condition, port, backend, runId, logDir, study: tag });
       let j = "";
