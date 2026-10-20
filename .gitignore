@@ -4,3 +4,4 @@ contracts/out/
 contracts/cache/
 .tmp/
 .env
+ops/logs/
