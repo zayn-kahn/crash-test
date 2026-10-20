@@ -222,7 +222,7 @@ export class OpenRouterBackend implements AgentBackend {
       messages: [{ role: "system", content: system }, ...messages],
       ...(tools ? { tools } : {}),
       max_tokens: maxTokens,
-      reasoning: this.info.reasoning,
+      ...(this.info.reasoning ? { reasoning: this.info.reasoning } : {}), // none for models without thinking (llama-4-scout)
       // Route only to providers that support every parameter we send (tools, reasoning).
       provider: { require_parameters: true },
       usage: { include: true },

@@ -15,6 +15,10 @@
  *   qwen3.7-plus    on by default, no effort levels -> enabled
  *   gemma-4-26b     OFF by default, no effort levels -> enabled (Claude always thinks; also gives the judge text)
  *   qwen3.5-9b      no effort levels -> enabled
+ *   glm-5.3-flash   reasoning mandatory; efforts max/high/low, default max -> "high" (like deepseek)
+ *   gemini-2.5-fl   optional, no effort levels -> enabled
+ *   mistral-small   efforts high/none, off by default -> "high"
+ *   llama-4-scout   no thinking mode at all -> nothing sent (the one non-thinking agent in the set)
  */
 import { AGENT } from "../config.js";
 
@@ -36,12 +40,51 @@ export interface OpenRouterModel {
   cacheRead?: number;
   /** Date the prices were copied (PKT). */
   priceRead: string;
-  reasoning: OpenRouterReasoning;
+  /** Omitted for models with no thinking mode (sending it would leave no provider under require_parameters). */
+  reasoning?: OpenRouterReasoning;
   /** Why this model, and anything that differs from the brief. */
   note: string;
 }
 
 export const OPENROUTER_MODELS = [
+  {
+    id: "z-ai/glm-5.3-flash",
+    alias: "glm",
+    prompt: 0.048,
+    completion: 0.12,
+    cacheRead: 0.006,
+    priceRead: "2026-10-21",
+    reasoning: { effort: "high" },
+    note: "Zain's pick (2026-10-21). Zhipu's cheap tier; reasoning mandatory.",
+  },
+  {
+    id: "meta-llama/llama-4-scout",
+    alias: "llama4scout",
+    prompt: 0.1,
+    completion: 0.3,
+    priceRead: "2026-10-21",
+    note: "Open weights, NO thinking mode: the non-reasoning agent many cheap products still run.",
+  },
+  {
+    id: "google/gemini-2.5-flash-lite",
+    alias: "geminilite",
+    prompt: 0.1,
+    completion: 0.4,
+    cacheRead: 0.01,
+    priceRead: "2026-10-21",
+    reasoning: { enabled: true },
+    note: "A common default in cheap agent products; a third provider family.",
+  },
+  {
+    id: "mistralai/mistral-small-2603",
+    alias: "mistralsmall",
+    prompt: 0.15,
+    completion: 0.6,
+    cacheRead: 0.015,
+    priceRead: "2026-10-21",
+    reasoning: { effort: "high" },
+    note: "European open model (optional).",
+  },
   {
     id: "openai/gpt-5-mini",
     alias: "gpt5mini",
