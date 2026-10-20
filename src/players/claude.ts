@@ -6,7 +6,19 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam, Tool, ToolResultBlockParam, Usage } from "@anthropic-ai/sdk/resources/messages";
-import { AGENT, PRICES, type ModelId } from "../config.js";
+import { AGENT, PRICES, THINKING, type ModelId } from "../config.js";
+
+/**
+ * Thinking settings per model (config.ts THINKING): adaptive + effort on 4.7+/5.x; a fixed thinking budget on
+ * Claude 4.5 and earlier, which reject `adaptive`, `display` and `effort`. Interleaved thinking between tool calls
+ * is automatic on adaptive models; on 4.5 the model thinks at the start of each reply.
+ */
+function thinkingParams(model: ModelId) {
+  const t = THINKING[model];
+  return t.mode === "adaptive"
+    ? { thinking: { type: "adaptive" as const, display: AGENT.thinkingDisplay }, output_config: { effort: AGENT.effort } }
+    : { thinking: { type: "enabled" as const, budget_tokens: t.budgetTokens } };
+}
 import { apiSettingsFromDotEnv } from "../env.js";
 import type { AgentBackend, ToolDef, TurnRequest, TurnResult } from "./types.js";
 
@@ -69,7 +81,7 @@ export class ClaudeBackend implements AgentBackend {
         max_tokens: o.maxTokens ?? AGENT.maxTokens,
         system: o.system,
         messages: [{ role: "user", content: o.prompt }],
-        output_config: { effort: AGENT.effort },
+        ...(THINKING[this.model].mode === "adaptive" ? { output_config: { effort: AGENT.effort } } : {}),
       },
       { timeout: this.opts.turnTimeoutMs ?? AGENT.turnTimeoutMs },
     );
@@ -106,8 +118,7 @@ export class ClaudeBackend implements AgentBackend {
           system: [{ type: "text", text: req.system, cache_control: { type: "ephemeral" } }],
           tools,
           messages,
-          thinking: { type: "adaptive", display: AGENT.thinkingDisplay },
-          output_config: { effort: AGENT.effort },
+          ...thinkingParams(this.model),
         },
         { timeout: left },
       );

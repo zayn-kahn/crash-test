@@ -5,7 +5,7 @@
  */
 
 /** The models we run, cheapest first. Haiku 5.5 is the main model; Sonnet 5.5 is the second (see the brain's Costs). */
-export const MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5"] as const;
+export const MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-haiku-4-5"] as const;
 export type ModelId = (typeof MODELS)[number];
 
 /**
@@ -28,6 +28,19 @@ export const PRICES: Record<ModelId, Price & { long?: Price; longAbove?: number 
     long: { input: 0.5, output: 2.5, cacheWrite: 0.625, cacheRead: 0.05 },
   },
   "claude-sonnet-5-5": { input: 2, output: 10, cacheWrite: 2.5, cacheRead: 0.1 },
+  "claude-haiku-4-5": { input: 1, output: 5, cacheWrite: 1.25, cacheRead: 0.1 },
+};
+
+/**
+ * How each model thinks. Claude 4.7+ and 5.x: adaptive thinking steered by AGENT.effort. Claude 4.5 and earlier
+ * support only manual extended thinking (a fixed token budget, no effort parameter, no `display`); the budget
+ * below is the closest stand-in for "medium" and is reported with the results (checked on platform.claude.com
+ * docs, extended-thinking + effort pages, 2026-10-21).
+ */
+export const THINKING: Record<ModelId, { mode: "adaptive" } | { mode: "budget"; budgetTokens: number }> = {
+  "claude-haiku-5-5": { mode: "adaptive" },
+  "claude-sonnet-5-5": { mode: "adaptive" },
+  "claude-haiku-4-5": { mode: "budget", budgetTokens: 4_000 },
 };
 
 export const AGENT = {
