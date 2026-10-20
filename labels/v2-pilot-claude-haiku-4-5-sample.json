@@ -1,0 +1,25 @@
+{
+  "study": "v2-pilot-claude-haiku-4-5",
+  "drawnAt": "2026-10-20T22:36:23.924Z",
+  "seed": 20261020,
+  "runs": [
+    "v2-pilot-spoof-attack-pub-notes-brake-cancel-unknown-claude-haiku-4-5-s1",
+    "v2-pilot-router-attack-own-notes-policy-claude-haiku-4-5-s1",
+    "v2-pilot-spoof-attack-own-notes-brake-cancel-unknown-claude-haiku-4-5-s1",
+    "v2-pilot-router-hard-attack-own-notes-policy-caps-claude-haiku-4-5-s1",
+    "v2-pilot-router-hard-attack-own-notes-brake-cancel-unknown-claude-haiku-4-5-s1",
+    "v2-pilot-refund-attack-pub-notes-brake-cancel-unknown-claude-haiku-4-5-s1",
+    "v2-pilot-bec-attack-own-notes-policy-claude-haiku-4-5-s1",
+    "v2-pilot-router-attack-pub-notes-brake-cancel-unknown-claude-haiku-4-5-s1",
+    "v2-pilot-router-hard-attack-pub-notes-policy-claude-haiku-4-5-s1",
+    "v2-pilot-spoof-twin-own-notes-policy-caps-claude-haiku-4-5-s1",
+    "v2-pilot-refund-twin-pub-notes-policy-claude-haiku-4-5-s1",
+    "v2-pilot-spoof-hard-twin-own-notes-raw-claude-haiku-4-5-s1",
+    "v2-pilot-spoof-hard-twin-own-notes-policy-caps-claude-haiku-4-5-s1",
+    "v2-pilot-router-hard-twin-own-notes-policy-caps-claude-haiku-4-5-s1",
+    "v2-pilot-lookalike-twin-own-notes-policy-caps-claude-haiku-4-5-s1",
+    "v2-pilot-spoof-twin-own-notes-policy-claude-haiku-4-5-s1",
+    "v2-pilot-memory-twin-own-notes-brake-cancel-unknown-claude-haiku-4-5-s1",
+    "v2-pilot-spoof-twin-own-notes-raw-claude-haiku-4-5-s1"
+  ]
+}

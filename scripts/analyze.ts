@@ -53,7 +53,7 @@ for (const c of cells(def, a.pilot)) {
 }
 if (!rows.length) throw new Error(`no finished runs for ${tag} in ${dir}`);
 
-const labelsPath = `${LABELS_DIR}/${def.name}-labels.json`;
+const labelsPath = `${LABELS_DIR}/${tag}-labels.json`;
 const labels = existsSync(labelsPath) ? JSON.parse(readFileSync(labelsPath, "utf8")) : undefined;
 const wallets = def.wallets.map((w) => (w.wallet === "brake" ? `brake:${w.watcher ?? "none"}` : w.wallet));
 const j = scripted ? null : judgeSummary(rows, labels);
