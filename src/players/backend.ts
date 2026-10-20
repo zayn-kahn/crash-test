@@ -18,7 +18,7 @@ import type { AgentBackend } from "./types.js";
 export type AgentModelId = ModelId | OpenRouterModelId;
 
 /** Short names for the Claude models (the same ones scripts/sim.ts accepts). */
-export const CLAUDE_ALIASES: Record<string, ModelId> = { haiku: "claude-haiku-5-5", sonnet: "claude-sonnet-5-5", haiku45: "claude-haiku-4-5" };
+export const CLAUDE_ALIASES: Record<string, ModelId> = { haiku: "claude-haiku-5-5", sonnet: "claude-sonnet-5-5", haiku45: "claude-haiku-4-5", sonnet45: "claude-sonnet-4-5", opus45: "claude-opus-4-5" };
 
 /** Every model a run can use, exact ids. */
 export const AGENT_MODELS: readonly AgentModelId[] = [...MODELS, ...OPENROUTER_MODELS.map((m) => m.id)];

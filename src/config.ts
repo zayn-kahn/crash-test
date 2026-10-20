@@ -5,7 +5,7 @@
  */
 
 /** The models we run, cheapest first. Haiku 5.5 is the main model; Sonnet 5.5 is the second (see the brain's Costs). */
-export const MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-haiku-4-5"] as const;
+export const MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-haiku-4-5", "claude-sonnet-4-5", "claude-opus-4-5"] as const;
 export type ModelId = (typeof MODELS)[number];
 
 /**
@@ -29,6 +29,8 @@ export const PRICES: Record<ModelId, Price & { long?: Price; longAbove?: number 
   },
   "claude-sonnet-5-5": { input: 2, output: 10, cacheWrite: 2.5, cacheRead: 0.1 },
   "claude-haiku-4-5": { input: 1, output: 5, cacheWrite: 1.25, cacheRead: 0.1 },
+  "claude-sonnet-4-5": { input: 3, output: 15, cacheWrite: 3.75, cacheRead: 0.3 },
+  "claude-opus-4-5": { input: 5, output: 25, cacheWrite: 6.25, cacheRead: 0.5 },
 };
 
 /**
@@ -41,6 +43,9 @@ export const THINKING: Record<ModelId, { mode: "adaptive" } | { mode: "budget"; 
   "claude-haiku-5-5": { mode: "adaptive" },
   "claude-sonnet-5-5": { mode: "adaptive" },
   "claude-haiku-4-5": { mode: "budget", budgetTokens: 4_000 },
+  // Same 4.5 generation, same manual budget (Opus 4.5 also takes effort; kept on the budget so the 4.5 trio match).
+  "claude-sonnet-4-5": { mode: "budget", budgetTokens: 4_000 },
+  "claude-opus-4-5": { mode: "budget", budgetTokens: 4_000 },
 };
 
 export const AGENT = {
