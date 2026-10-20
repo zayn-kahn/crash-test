@@ -8,6 +8,7 @@
  * messages). Every value that comes from a log or the API goes through esc() before it lands in HTML.
  */
 import { dusd, esc, md, modelLabel, morseIn, short, timeAgo, walletLabel } from "./format";
+import { statsHtml } from "./stats";
 
 type Ev = Record<string, any>;
 interface RunRow {
@@ -25,8 +26,12 @@ interface RunRow {
   status: "done" | "running" | "stopped";
   study?: string | null;
   instructions?: string;
+  trustRoot?: string;
+  /** Proposals toward an attacker (the agent was fooled), whatever the wallet did; null while running. */
+  attackerAttempts?: number | null;
+  lostDusd?: string | null;
   leaks: { label: string; when: number | "settle"; afterWait?: boolean; signed?: boolean; dusd: string | null; allowance?: string }[];
-  honest: { label: string; done: boolean; delayed: boolean }[] | null;
+  honest: { label: string; done: boolean; delayed: boolean; attempted?: boolean; ownerApproved?: boolean }[] | null;
   questions: number;
   apiRefusals: number;
   encoding: string | null;
@@ -159,7 +164,7 @@ function runsTable(rows: RunRow[], titles: Map<string, string>, showScenario: bo
 }
 
 /** The list page's filters; kept in the URL (#/scenarios?attack=grok&page=2) so reload and Back keep them. */
-const FILTERS = ["study", "attack", "role", "source", "encoding", "wallet", "agent", "result"] as const;
+const FILTERS = ["study", "attack", "role", "source", "trust", "encoding", "wallet", "agent", "result"] as const;
 type Filter = (typeof FILTERS)[number];
 interface ListState {
   f: Partial<Record<Filter, string>>;
@@ -190,6 +195,7 @@ function matches(r: RunRow, st: ListState, except?: Filter): boolean {
   if (!st.scripted && (r.player === "dry-run" || r.player === "gullible")) return false;
   if (except !== "study" && f.study && (r.study ?? "none") !== f.study) return false;
   if (except !== "source" && f.source && (r.instructions ?? "owner-only") !== f.source) return false;
+  if (except !== "trust" && f.trust && (r.trustRoot ?? "contacts") !== f.trust) return false;
   if (except !== "attack" && f.attack && r.scenario !== f.attack) return false;
   if (except !== "role" && f.role && r.role !== f.role) return false;
   if (except !== "encoding" && f.encoding && (r.encoding ?? "none") !== f.encoding) return false;
@@ -221,7 +227,8 @@ async function scenariosPage() {
     pick one to watch it turn by turn. Runs in progress appear on their own and update live.</p>
     <div class="card filters" id="filters"></div>
     <div id="about-scenario"></div>
-    <div class="card"><p class="muted small" id="tally"></p><div id="table"></div><div class="pager" id="pager"></div></div>`;
+    <div class="card"><p class="muted small" id="tally"></p><div id="table"></div><div class="pager" id="pager"></div></div>
+    <div id="stats"></div>`;
 
   const count = (k: Filter, pick: (r: RunRow) => string) => {
     const m = new Map<string, number>();
@@ -242,6 +249,7 @@ async function scenariosPage() {
         ${select("attack", "Attack type", st.f.attack, opts("attack", (r) => r.scenario, (v) => `${v}: ${shortTitle(titles.get(v) ?? "")}`, scenarios.map((s) => s.id)))}
         ${select("role", "Version", st.f.role, opts("role", (r) => r.role, (v) => (v === "attack" ? "Attack" : "Harmless twin"), ["attack", "twin"]))}
         ${select("source", "Instructions from", st.f.source, opts("source", (r) => r.instructions ?? "owner-only", (v) => ({ "owner-only": "Owner only", "public-requests": "Owner + public requests" })[v] ?? v))}
+        ${select("trust", "Who's who from", st.f.trust, opts("trust", (r) => r.trustRoot ?? "contacts", (v) => ({ contacts: "Address book in the prompt", notes: "Own notes + chain history" })[v] ?? v, ["contacts", "notes"]))}
         ${select("encoding", "Hidden line", st.f.encoding, opts("encoding", (r) => r.encoding ?? "none", (v) => ({ morse: "Morse code", plain: "Plain text", base64: "Base64", "zero-width": "Zero-width characters", none: "Nothing hidden" })[v] ?? v))}
         ${select("wallet", "Wallet", st.f.wallet, opts("wallet", walletKey, (v) => { const [w, x] = v.split(":"); return walletLabel(w, x ?? null); }))}
         ${select("agent", "Agent", st.f.agent, opts("agent", (r) => r.model, modelLabel))}
@@ -294,6 +302,15 @@ async function scenariosPage() {
       ? `<b>${shown.length}</b> run${shown.length > 1 ? "s" : ""} · money leaked in <b>${leaked} of ${attacks.length}</b> finished attack runs${blocked ? ` · safety filter blocked a turn in ${blocked}` : ""} · cost $${cost.toFixed(3)}`
       : "";
     document.getElementById("table")!.innerHTML = runsTable(page, titles, !st.f.attack);
+    document.getElementById("stats")!.innerHTML = statsHtml(shown, {
+      walletKey: (r) => walletKey(r as RunRow),
+      wallet: (k) => {
+        const [w, x] = k.split(":");
+        return walletLabel(w, x ?? null);
+      },
+      model: modelLabel,
+      scenario: (id) => id,
+    });
     document.getElementById("pager")!.innerHTML =
       pages > 1
         ? `<button class="link" id="prev"${st.page === 1 ? " disabled" : ""}>← Newer</button>
