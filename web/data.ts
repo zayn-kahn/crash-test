@@ -2,7 +2,7 @@
  * Reads the run logs for the viewer's local server (web/vite.config.ts): the scenarios, one summary per
  * run (newest first), and every event of one run.
  */
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "..");
@@ -86,4 +86,43 @@ export function runSummaries() {
   return runIds()
     .map(runSummary)
     .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Hand labels (the #/label page). labels/<tag>-sample.json lists the drawn runs (pnpm label:sample);
+// labels/<tag>-labels.json holds the answers. The page never sees the judge's verdicts (blind labelling).
+
+const LABELS = join(ROOT, "labels");
+type Label = { declined_something: boolean | null; flagged_suspicious: boolean | null; note: string };
+
+export function labelSets(): { tag: string; runs: string[]; labels: Record<string, Label> }[] {
+  if (!existsSync(LABELS)) return [];
+  return readdirSync(LABELS)
+    .filter((f) => f.endsWith("-sample.json"))
+    .sort()
+    .map((f) => {
+      const tag = f.replace(/-sample\.json$/, "");
+      const runs: string[] = JSON.parse(readFileSync(join(LABELS, f), "utf8")).runs;
+      const lp = join(LABELS, `${tag}-labels.json`);
+      const labels = existsSync(lp) ? JSON.parse(readFileSync(lp, "utf8")) : {};
+      return { tag, runs, labels };
+    });
+}
+
+/** Save one run's label. Only runs in the drawn sample, only booleans/null and a short note. */
+export function saveLabel(tag: string, body: { runId?: unknown; declined_something?: unknown; flagged_suspicious?: unknown; note?: unknown }): Label {
+  const set = labelSets().find((s) => s.tag === tag);
+  if (!set) throw new Error(`no sample ${tag}`);
+  const id = String(body.runId ?? "");
+  if (!set.runs.includes(id)) throw new Error("run not in the sample");
+  const bool = (v: unknown) => (v === true || v === false ? v : null);
+  const label: Label = {
+    declined_something: bool(body.declined_something),
+    flagged_suspicious: bool(body.flagged_suspicious),
+    note: typeof body.note === "string" ? body.note.slice(0, 1000) : "",
+  };
+  const labels = { ...set.labels, [id]: label };
+  const ordered = Object.fromEntries(set.runs.map((r) => [r, labels[r] ?? { declined_something: null, flagged_suspicious: null, note: "" }]));
+  writeFileSync(join(LABELS, `${tag}-labels.json`), JSON.stringify(ordered, null, 2) + "\n");
+  return label;
 }

@@ -227,7 +227,7 @@ export function judgeSummary(rows: RunRow[], labels?: Record<string, { declined_
   const j = rows.filter((r) => r.verdict);
   const atk = j.filter((r) => r.role === "attack");
   const twin = j.filter((r) => r.role === "twin");
-  const labelled = labels ? j.filter((r) => labels[r.id] && labels[r.id].declined_something !== null) : [];
+  const labelled = labels ? j.filter((r) => labels[r.id] && labels[r.id].declined_something != null && labels[r.id].flagged_suspicious != null) : [];
   return {
     judged: j.length,
     errors: rows.length - j.length,

@@ -4,10 +4,12 @@
  *   GET /data/scenarios.json   every prompts/scenarios/<id>/README.md
  *   GET /data/runs.json        one summary per data/runs/<id>.jsonl, newest first
  *   GET /data/runs/<id>.json   every event of one run
+ *   GET /data/labels.json      the hand-label samples and answers (labels/)
+ *   POST /data/labels/<tag>    save one run's hand label (the #/label page)
  * Run with `pnpm web` from crash-test/.
  */
 import { defineConfig, type Plugin } from "vite";
-import { runEvents, runSummaries, scenarios } from "./data";
+import { labelSets, runEvents, runSummaries, saveLabel, scenarios } from "./data";
 
 function liveData(): Plugin {
   const send = (res: any, body: unknown, code = 200) => {
@@ -25,6 +27,20 @@ function liveData(): Plugin {
         try {
           if (url === "/data/scenarios.json") return send(res, scenarios());
           if (url === "/data/runs.json") return send(res, runSummaries());
+          if (url === "/data/labels.json") return send(res, labelSets());
+          const lm = url.match(/^\/data\/labels\/([\w.-]+)$/);
+          if (lm && req.method === "POST") {
+            let body = "";
+            req.on("data", (c: Buffer) => (body += c));
+            req.on("end", () => {
+              try {
+                send(res, saveLabel(lm[1], JSON.parse(body || "{}")));
+              } catch (err) {
+                send(res, { error: String(err) }, 400);
+              }
+            });
+            return;
+          }
           const m = url.match(/^\/data\/runs\/([^/]+)\.json$/);
           const ev = m ? runEvents(m[1]) : null;
           return ev ? send(res, ev) : send(res, { error: "not found" }, 404);
