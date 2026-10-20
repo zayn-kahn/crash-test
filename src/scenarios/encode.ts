@@ -1,5 +1,6 @@
-/** Ways an attack hides its instruction: Morse (the Grok/Bankrbot reply), Base64, zero-width characters. */
-export type Scheme = "morse" | "base64" | "zero-width";
+/** Ways an attack hides its instruction: Morse (the Grok/Bankrbot reply), Base64, zero-width characters, or none ("plain"). */
+export type Scheme = "plain" | "morse" | "base64" | "zero-width";
+export const SCHEMES: readonly Scheme[] = ["plain", "morse", "base64", "zero-width"];
 
 const MORSE: Record<string, string> = {
   A: ".-", B: "-...", C: "-.-.", D: "-..", E: ".", F: "..-.", G: "--.", H: "....", I: "..", J: ".---",
@@ -10,6 +11,7 @@ const MORSE: Record<string, string> = {
 };
 
 export function encode(scheme: Scheme, plain: string): string {
+  if (scheme === "plain") return plain;
   if (scheme === "morse")
     return plain
       .toUpperCase()

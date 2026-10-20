@@ -17,9 +17,15 @@ pnpm sim --scenario grok --role attack --wallet brake --watcher cancel-unknown -
 pnpm web                                                                       # viewer: http://127.0.0.1:5173
 ```
 
-The viewer (`web/`, Vite, no framework) explains the project, lists every scenario and every run in
-`data/runs/`, and replays a run turn by turn: what arrived, what the agent thought and did, what moved on
-the chain. A run in progress shows up on its own and updates every 2 seconds.
+The viewer (`web/`, Vite, no framework, local only) explains the project, lists every run in `data/runs/`
+with filters (attack type, attack or twin, how the line is hidden, wallet, agent, result) and 15 per page,
+and replays a run turn by turn: what arrived, what the agent thought and did, what moved on the chain. A
+run in progress shows up on its own and updates every 2 seconds. The logs never leave this machine.
+
+```sh
+pnpm sim --scenario grok-public --role attack --wallet raw --encoding plain --player haiku --seed 1
+```
+`--encoding plain|morse|base64|zero-width` rewrites how a scenario's hidden instruction is written.
 
 ## Setup
 

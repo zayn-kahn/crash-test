@@ -99,3 +99,17 @@ ul.honest { padding-left: 4px; list-style: none; }
   .steps, .cols { grid-template-columns: 1fr; }
   .hero h1 { font-size: 26px; }
 }
+
+/* Runs list: filters and pages */
+.filters { padding: 14px 16px; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.filter-row.end { margin-top: 12px; justify-content: space-between; align-items: center; }
+.filter-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.filter-field select { font: inherit; font-size: 14px; color: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; width: 132px; }
+.filter-field select[data-filter="attack"] { width: 190px; }
+.filter-row.end .toggle { margin: 0; }
+button.link { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 14px; color: var(--blue) !important; cursor: pointer; }
+button.link:disabled { color: var(--muted) !important; cursor: default; opacity: .5; }
+.pager { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.pager:empty { display: none; }
+table.runs .tag, table.runs .badge, table.runs td:last-child a { white-space: nowrap; }

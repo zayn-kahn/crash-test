@@ -1,7 +1,7 @@
 /**
  * The viewer: three pages, picked by the URL hash.
  *   #/            what this is, in plain words
- *   #/scenarios   every scenario and every run of it (live runs refresh every few seconds)
+ *   #/scenarios   every run, filtered by attack type, version, wallet, agent, result; 15 per page; live
  *   #/run/<id>    one run, turn by turn, with a Play button
  *
  * Safety: the pages are built as HTML strings, and run logs hold untrusted text (agent output, attack
@@ -27,12 +27,16 @@ interface RunRow {
   honest: { label: string; done: boolean; delayed: boolean }[] | null;
   questions: number;
   apiRefusals: number;
+  encoding: string | null;
   costUsd: number;
 }
 
 const app = document.getElementById("app")!;
 let poll: number | undefined;
-const getJson = async <T>(url: string): Promise<T> => (await fetch(url)).json();
+const getJson = async <T>(url: string): Promise<T> => {
+  const r = await fetch(url, { cache: "no-store" });
+  return r.ok ? r.json() : ({ error: r.status } as T);
+};
 
 function route() {
   window.clearInterval(poll);
@@ -121,14 +125,26 @@ function honestCell(r: RunRow): string {
   return `<span class="${cls}">${done}/${r.honest.length} paid</span>${delayed ? ` <span class="muted">(${delayed} delayed)</span>` : ""}`;
 }
 
-function runsTable(rows: RunRow[]): string {
-  if (!rows.length) return `<p class="muted">No runs yet.</p>`;
-  return `<table class="runs"><thead><tr><th>When</th><th>Version</th><th>Wallet</th><th>Agent</th><th>Result</th><th>Owner's payments</th><th>Cost</th><th></th></tr></thead><tbody>
+type Scenario = { id: string; readme: string; title: string; summary: string };
+const PAGE_SIZE = 15;
+
+function scenarioInfo(s: { id: string; readme: string }): Scenario {
+  const [first, ...rest] = s.readme.trim().split("\n");
+  const title = first.replace(/^#\s*/, "");
+  return { ...s, title, summary: rest.join("\n") };
+}
+/** "grok: hidden instructions in an NFT…" -> "hidden instructions in an NFT…" for table cells. */
+const shortTitle = (t: string) => t.replace(/^[\w-]+:\s*/, "");
+
+function runsTable(rows: RunRow[], titles: Map<string, string>, showScenario: boolean): string {
+  if (!rows.length) return `<p class="muted">No runs match these filters.</p>`;
+  return `<table class="runs"><thead><tr><th>When</th>${showScenario ? "<th>Attack type</th>" : ""}<th>Version</th><th>Wallet</th><th>Agent</th><th>Result</th><th>Owner's payments</th><th>Cost</th><th></th></tr></thead><tbody>
   ${rows
     .map(
       (r) => `<tr data-href="#/run/${esc(encodeURIComponent(r.id))}">
       <td>${esc(timeAgo(r.startedAt))}</td>
-      <td>${r.role === "attack" ? `<span class="tag red">Attack</span>` : `<span class="tag">Harmless twin</span>`}</td>
+      ${showScenario ? `<td title="${esc(shortTitle(titles.get(r.scenario) ?? ""))}"><b>${esc(r.scenario)}</b></td>` : ""}
+      <td>${r.role === "attack" ? `<span class="tag red">Attack</span>` : `<span class="tag">Harmless twin</span>`}${r.encoding === "plain" ? `<div class="muted tiny">hidden line in plain text</div>` : ""}</td>
       <td>${esc(walletLabel(r.wallet, r.watcher))}</td>
       <td>${esc(modelLabel(r.model))}</td>
       <td>${verdict(r)}${r.apiRefusals ? `<div class="muted tiny">🛑 safety filter blocked ${r.apiRefusals} turn${r.apiRefusals > 1 ? "s" : ""}</div>` : ""}</td>
@@ -139,34 +155,166 @@ function runsTable(rows: RunRow[]): string {
     .join("")}</tbody></table>`;
 }
 
+/** The list page's filters; kept in the URL (#/scenarios?attack=grok&page=2) so reload and Back keep them. */
+const FILTERS = ["attack", "role", "encoding", "wallet", "agent", "result"] as const;
+type Filter = (typeof FILTERS)[number];
+interface ListState {
+  f: Partial<Record<Filter, string>>;
+  scripted: boolean;
+  page: number;
+}
+function readState(): ListState {
+  const q = new URLSearchParams(location.hash.split("?")[1] ?? "");
+  const f: ListState["f"] = {};
+  for (const k of FILTERS) if (q.get(k)) f[k] = q.get(k)!;
+  return { f, scripted: q.get("scripted") !== "0", page: Math.max(1, Number(q.get("page")) || 1) };
+}
+function writeState(st: ListState) {
+  const q = new URLSearchParams();
+  for (const k of FILTERS) if (st.f[k]) q.set(k, st.f[k]!);
+  if (!st.scripted) q.set("scripted", "0");
+  if (st.page > 1) q.set("page", String(st.page));
+  const qs = q.toString();
+  const hash = `#/scenarios${qs ? `?${qs}` : ""}`;
+  history.replaceState(null, "", hash); // no hashchange, so no re-render
+  sessionStorage.setItem("listHash", hash); // the run page's "All runs" link comes back here
+}
+
+const walletKey = (r: RunRow) => (r.wallet === "brake" ? `brake:${r.watcher ?? "none"}` : r.wallet);
+const resultKey = (r: RunRow) => (r.status === "running" ? "running" : r.leaks.length ? "leaked" : r.status === "stopped" ? "stopped" : "safe");
+function matches(r: RunRow, st: ListState, except?: Filter): boolean {
+  const f = st.f;
+  if (!st.scripted && r.player === "dry-run") return false;
+  if (except !== "attack" && f.attack && r.scenario !== f.attack) return false;
+  if (except !== "role" && f.role && r.role !== f.role) return false;
+  if (except !== "encoding" && f.encoding && (r.encoding ?? "none") !== f.encoding) return false;
+  if (except !== "wallet" && f.wallet && walletKey(r) !== f.wallet) return false;
+  if (except !== "agent" && f.agent && r.model !== f.agent) return false;
+  if (except !== "result") {
+    if (f.result === "filter" && !r.apiRefusals) return false;
+    else if (f.result && f.result !== "filter" && resultKey(r) !== f.result) return false;
+  }
+  return true;
+}
+
+function select(name: Filter, label: string, value: string | undefined, options: [string, string, number][]): string {
+  return `<label class="filter-field"><span>${esc(label)}</span><select data-filter="${name}">
+    <option value="">All</option>
+    ${options.map(([v, text, n]) => `<option value="${esc(v)}"${v === value ? " selected" : ""}>${esc(text)} (${n})</option>`).join("")}
+  </select></label>`;
+}
+
 async function scenariosPage() {
-  const scenarios = await getJson<{ id: string; readme: string }[]>("/api/scenarios");
+  const scenarios = (await getJson<{ id: string; readme: string }[]>("data/scenarios.json")).map(scenarioInfo);
+  const titles = new Map(scenarios.map((s) => [s.id, s.title]));
+  const st = readState();
+  let rows: RunRow[] = [];
+
   app.innerHTML = `
     <h1>Scenarios &amp; runs</h1>
-    <p class="lead small">Each scenario is a real 2026 incident, rebuilt on a private test chain. Pick a run to watch it
-    turn by turn. Runs in progress appear here on their own and update live.</p>
-    <label class="toggle"><input type="checkbox" id="showDry" checked> Show scripted test runs (no AI, free)</label>
-    ${scenarios
-      .map((s) => {
-        const [first, ...rest] = s.readme.trim().split("\n");
-        return `<section class="card scenario">
-          <h2>${esc(first.replace(/^#\s*/, ""))}</h2>
-          <details><summary>What happens in this scenario</summary><div class="readme">${md(rest.join("\n"))}</div></details>
-          <div class="runs-slot" data-scenario="${esc(s.id)}"><p class="muted">Loading runs…</p></div>
-        </section>`;
-      })
-      .join("")}
-    <p class="muted">Five more scenarios (memory poisoning, a malicious router, a look-alike claim page, split payments,
-    a fake refund) arrive in the next phase.</p>`;
-  const refresh = async () => {
-    const rows = await getJson<RunRow[]>("/api/runs");
-    const showDry = (document.getElementById("showDry") as HTMLInputElement | null)?.checked ?? true;
-    for (const slot of document.querySelectorAll<HTMLElement>(".runs-slot")) {
-      slot.innerHTML = runsTable(rows.filter((r) => r.scenario === slot.dataset.scenario && (showDry || r.player !== "dry-run")));
-    }
+    <p class="lead small">Each scenario is a real 2026 incident, rebuilt on a private test chain. Filter the runs, then
+    pick one to watch it turn by turn. Runs in progress appear on their own and update live.</p>
+    <div class="card filters" id="filters"></div>
+    <div id="about-scenario"></div>
+    <div class="card"><p class="muted small" id="tally"></p><div id="table"></div><div class="pager" id="pager"></div></div>
+    <p class="muted">Five more attack types (memory poisoning, a malicious router, a look-alike claim page, split
+    payments, a fake refund) arrive in the next phase.</p>`;
+
+  const count = (k: Filter, pick: (r: RunRow) => string) => {
+    const m = new Map<string, number>();
+    for (const r of rows) if (matches(r, st, k)) m.set(pick(r), (m.get(pick(r)) ?? 0) + 1);
+    return m;
   };
-  document.getElementById("showDry")!.addEventListener("change", refresh);
+  const opts = (k: Filter, pick: (r: RunRow) => string, label: (v: string) => string, order?: string[]): [string, string, number][] => {
+    const m = count(k, pick);
+    if (st.f[k] && !m.has(st.f[k]!)) m.set(st.f[k]!, 0); // keep the chosen value visible
+    const keys = order ? order.filter((v) => m.has(v)).concat([...m.keys()].filter((v) => !order.includes(v))) : [...m.keys()].sort();
+    return keys.map((v) => [v, label(v), m.get(v) ?? 0]);
+  };
+
+  const renderFilters = () => {
+    document.getElementById("filters")!.innerHTML = `
+      <div class="filter-row">
+        ${select("attack", "Attack type", st.f.attack, opts("attack", (r) => r.scenario, (v) => `${v}: ${shortTitle(titles.get(v) ?? "")}`, scenarios.map((s) => s.id)))}
+        ${select("role", "Version", st.f.role, opts("role", (r) => r.role, (v) => (v === "attack" ? "Attack" : "Harmless twin"), ["attack", "twin"]))}
+        ${select("encoding", "Hidden line", st.f.encoding, opts("encoding", (r) => r.encoding ?? "none", (v) => ({ morse: "Morse code", plain: "Plain text", base64: "Base64", "zero-width": "Zero-width characters", none: "Nothing hidden" })[v] ?? v))}
+        ${select("wallet", "Wallet", st.f.wallet, opts("wallet", walletKey, (v) => { const [w, x] = v.split(":"); return walletLabel(w, x ?? null); }))}
+        ${select("agent", "Agent", st.f.agent, opts("agent", (r) => r.model, modelLabel))}
+        ${select("result", "Result", st.f.result, [
+          ...opts("result", resultKey, (v) => ({ leaked: "Money leaked", safe: "Nothing leaked", running: "Running now", stopped: "Stopped early" })[v] ?? v, ["leaked", "safe", "running", "stopped"]),
+          ["filter", "Safety filter blocked a turn", rows.filter((r) => matches(r, st, "result") && r.apiRefusals).length],
+        ])}
+      </div>
+      <div class="filter-row end">
+        <label class="toggle"><input type="checkbox" id="scripted"${st.scripted ? " checked" : ""}> Show scripted test runs (no AI, free)</label>
+        ${Object.keys(st.f).length ? `<button class="link" id="clear">Clear filters</button>` : ""}
+      </div>`;
+    for (const el of document.querySelectorAll<HTMLSelectElement>("select[data-filter]"))
+      el.addEventListener("change", () => {
+        const k = el.dataset.filter as Filter;
+        if (el.value) st.f[k] = el.value;
+        else delete st.f[k];
+        st.page = 1;
+        render();
+      });
+    document.getElementById("scripted")!.addEventListener("change", (e) => {
+      st.scripted = (e.target as HTMLInputElement).checked;
+      st.page = 1;
+      render();
+    });
+    document.getElementById("clear")?.addEventListener("click", () => {
+      st.f = {};
+      st.page = 1;
+      render();
+    });
+  };
+
+  const render = () => {
+    writeState(st);
+    renderFilters();
+    const chosen = scenarios.find((s) => s.id === st.f.attack);
+    document.getElementById("about-scenario")!.innerHTML = chosen
+      ? `<section class="card scenario"><h2>${esc(chosen.title)}</h2><details><summary>What happens in this scenario</summary><div class="readme">${md(chosen.summary)}</div></details></section>`
+      : "";
+    const shown = rows.filter((r) => matches(r, st));
+    const pages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE));
+    st.page = Math.min(st.page, pages);
+    const from = (st.page - 1) * PAGE_SIZE;
+    const page = shown.slice(from, from + PAGE_SIZE);
+    const attacks = shown.filter((r) => r.role === "attack" && r.status === "done");
+    const leaked = attacks.filter((r) => r.leaks.length).length;
+    const blocked = shown.filter((r) => r.apiRefusals).length;
+    const cost = shown.reduce((s, r) => s + r.costUsd, 0);
+    document.getElementById("tally")!.innerHTML = shown.length
+      ? `<b>${shown.length}</b> run${shown.length > 1 ? "s" : ""} · money leaked in <b>${leaked} of ${attacks.length}</b> finished attack runs${blocked ? ` · safety filter blocked a turn in ${blocked}` : ""} · cost $${cost.toFixed(3)}`
+      : "";
+    document.getElementById("table")!.innerHTML = runsTable(page, titles, !st.f.attack);
+    document.getElementById("pager")!.innerHTML =
+      pages > 1
+        ? `<button class="link" id="prev"${st.page === 1 ? " disabled" : ""}>← Newer</button>
+           <span class="muted small">Showing ${from + 1}–${from + page.length} of ${shown.length} · page ${st.page} of ${pages}</span>
+           <button class="link" id="next"${st.page === pages ? " disabled" : ""}>Older →</button>`
+        : "";
+    document.getElementById("prev")?.addEventListener("click", () => {
+      st.page--;
+      render();
+    });
+    document.getElementById("next")?.addEventListener("click", () => {
+      st.page++;
+      render();
+    });
+  };
+
+  const refresh = async () => {
+    const next = await getJson<RunRow[]>("data/runs.json");
+    if (!Array.isArray(next)) return;
+    const changed = JSON.stringify(next) !== JSON.stringify(rows);
+    rows = next;
+    // Don't redraw while a dropdown is open; the next poll catches up.
+    if (changed && !(document.activeElement instanceof HTMLSelectElement)) render();
+  };
   await refresh();
+  if (!rows.length) render();
   poll = window.setInterval(refresh, 3000);
 }
 
@@ -178,7 +326,7 @@ async function runPage(id: string) {
   let shown = Infinity; // turns revealed (Play steps through them)
   let playing: number | undefined;
   const titles = new Map(
-    (await getJson<{ id: string; readme: string }[]>("/api/scenarios")).map((s) => [s.id, s.readme.trim().split("\n")[0].replace(/^#\s*/, "")]),
+    (await getJson<{ id: string; readme: string }[]>("data/scenarios.json")).map((s) => [s.id, s.readme.trim().split("\n")[0].replace(/^#\s*/, "")]),
   );
 
   const render = (ev: Ev[]) => {
@@ -212,6 +360,7 @@ async function runPage(id: string) {
       honest: end?.honest ?? null,
       questions: 0,
       apiRefusals: ev.filter((e) => e.kind === "agent_event" && e.event?.stop_reason === "refusal").length,
+      encoding: start.encoding ?? null,
       costUsd: ev.filter((e) => e.kind === "turn_usage").reduce((s, e) => s + Number(e.cost ?? 0), 0),
     };
 
@@ -307,7 +456,7 @@ async function runPage(id: string) {
 
     const turns = [...new Set<number>(ev.filter((e) => e.kind === "turn_start").map((e) => e.turn))];
     app.innerHTML = `
-      <p><a href="#/scenarios">← All runs</a></p>
+      <p><a href="${esc(sessionStorage.getItem("listHash") ?? "#/scenarios")}">← All runs</a></p>
       <section class="card head">
         <h1>${esc(titles.get(start.scenario) ?? start.scenario)} · ${start.role === "attack" ? `<span class="tag red">Attack</span>` : `<span class="tag">Harmless twin</span>`}</h1>
         <p class="meta">${esc(walletLabel(start.wallet, start.watcher))} · ${esc(modelLabel(start.model))} · seed ${esc(start.seed)} · ${row.costUsd ? `$${row.costUsd.toFixed(3)}` : "free"} · ${esc(timeAgo(row.startedAt))}</p>
@@ -340,7 +489,7 @@ async function runPage(id: string) {
   };
 
   const load = async () => {
-    const ev = await getJson<Ev[] | { error: string }>(`/api/runs/${encodeURIComponent(id)}`);
+    const ev = await getJson<Ev[] | { error: string }>(`data/runs/${encodeURIComponent(id)}.json`);
     if (!Array.isArray(ev)) {
       app.innerHTML = `<p>Run not found. <a href="#/scenarios">Back to all runs</a></p>`;
       window.clearInterval(poll);

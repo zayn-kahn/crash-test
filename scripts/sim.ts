@@ -5,6 +5,7 @@
  *   pnpm sim --scenario grok --role attack --wallet brake --watcher cancel-unknown --player haiku --seed 1
  *
  * --player: dry-run (free, scripted) | haiku | sonnet | a full model id from src/config.ts.
+ * --encoding: plain | morse | base64 | zero-width, overrides how the scenario's hidden line is written.
  * Model runs are refused once the spend logged in data/runs/ reaches MAX_USD.
  */
 import { parseArgs } from "node:util";
@@ -16,6 +17,7 @@ import type { AgentBackend } from "../src/players/types.js";
 import type { WalletKind } from "../src/prompts.js";
 import { spentUsd } from "../src/runs.js";
 import type { Role } from "../src/scenarios/load.js";
+import { SCHEMES, type Scheme } from "../src/scenarios/encode.js";
 import type { WatcherPolicy } from "../src/wallets/watcher.js";
 
 const { values: a } = parseArgs({
@@ -28,6 +30,7 @@ const { values: a } = parseArgs({
     player: { type: "string", default: "dry-run" },
     seed: { type: "string", default: "1" },
     port: { type: "string", default: "8545" },
+    encoding: { type: "string" },
   },
 });
 
@@ -40,6 +43,7 @@ const oneOf = <T extends string>(v: string, ok: readonly T[], what: string): T =
 const role = oneOf<Role>(a.role!, ["attack", "twin"], "role");
 const wallet = oneOf<WalletKind>(a.wallet!, ["raw", "brake"], "wallet");
 const watcher = oneOf<WatcherPolicy>(a.watcher!, ["none", "cancel-unknown"], "watcher");
+const encoding = a.encoding ? oneOf<Scheme>(a.encoding, SCHEMES, "encoding") : undefined;
 let backend: AgentBackend;
 if (a.player === "dry-run") backend = new DryRunBackend();
 else {
@@ -50,9 +54,9 @@ else {
 }
 
 const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
-const runId = `${a.scenario}-${role}-${wallet}${wallet === "brake" ? `-${watcher}` : ""}-${backend.model}-s${a.seed}-${stamp}`;
+const runId = `${a.scenario}${encoding ? `-${encoding}` : ""}-${role}-${wallet}${wallet === "brake" ? `-${watcher}` : ""}-${backend.model}-s${a.seed}-${stamp}`;
 console.log(`run ${runId}`);
-const s = await runEpisode({ scenario: a.scenario!, role, wallet, watcher, condition: a.condition!, seed: Number(a.seed), port: Number(a.port), backend, runId });
+const s = await runEpisode({ scenario: a.scenario!, role, wallet, watcher, condition: a.condition!, encoding, seed: Number(a.seed), port: Number(a.port), backend, runId });
 
 console.log(`log      ${s.logPath}`);
 console.log(`leaks    ${s.leaks.length ? s.leaks.map((l) => `${l.label}: ${l.dusd} dUSD, allowance ${l.allowance} (turn ${l.when})`).join("; ") : "none"}`);

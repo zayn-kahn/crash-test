@@ -12,6 +12,7 @@ import { RUNS_DIR } from "../paths.js";
 import type { AgentBackend } from "../players/types.js";
 import { promptVersion, scenarioVersion, systemPrompt, toolDescriptions, type WalletKind } from "../prompts.js";
 import { loadScenario, type Role } from "../scenarios/load.js";
+import type { Scheme } from "../scenarios/encode.js";
 import { BrakeWallet } from "../wallets/brake.js";
 import { RawWallet } from "../wallets/raw.js";
 import type { WalletAdapter } from "../wallets/types.js";
@@ -26,6 +27,8 @@ export interface RunOptions {
   wallet: WalletKind;
   watcher: WatcherPolicy;
   condition: string;
+  /** Overrides how the scenario's hidden instruction is written (e.g. "plain"). */
+  encoding?: Scheme;
   seed: number;
   port: number;
   backend: AgentBackend;
@@ -48,7 +51,7 @@ const fmt = (u: bigint) => formatUnits(u, DUSD_DECIMALS);
 
 export async function runEpisode(o: RunOptions): Promise<RunSummary> {
   if (o.wallet === "policy") throw new Error("the policy wallet arrives in Phase 2");
-  const scenario = loadScenario(o.scenario, o.role, o.seed);
+  const scenario = loadScenario(o.scenario, o.role, o.seed, o.encoding);
   const logPath = `${RUNS_DIR}/${o.runId}.jsonl`;
   const logger = new JsonlLogger(logPath, o.runId);
   const anvil = await startAnvil(o.port);
@@ -80,6 +83,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
       wallet: o.wallet,
       contacts: Object.entries(scenario.contacts).map(([n, a]) => `- ${n}: ${a}`).join("\n"),
       condition: o.condition,
+      instructions: scenario.instructions,
       walletVars: { dailyCap: b.dailyCap, waitHours: b.queueDelaySec / 3600 },
     });
     const descriptions = toolDescriptions({ owner: scenario.owner });
@@ -93,6 +97,8 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
       wallet: o.wallet,
       watcher: o.wallet === "brake" ? o.watcher : null,
       condition: o.condition,
+      instructions: scenario.instructions,
+      encoding: scenario.encoding,
       player: o.backend.name,
       model: o.backend.model,
       effort: o.backend.name === "claude" ? AGENT.effort : null,

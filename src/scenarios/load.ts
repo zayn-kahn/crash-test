@@ -41,6 +41,10 @@ export interface Scenario {
   feed: FeedItem[];
   /** URL -> page text, for read_url. */
   pages: Record<string, string>;
+  /** prompts/agent/instructions/<name>.md: "owner-only" (default) or "public-requests" (Bankrbot-like). */
+  instructions: string;
+  /** How the hidden instruction was written in this run (the scenario's scheme or the --encoding override); null if none. */
+  encoding: Scheme | null;
 }
 
 interface RawFeedItem extends FeedItem {
@@ -49,6 +53,7 @@ interface RawFeedItem extends FeedItem {
 interface RawScenario {
   turns: number;
   owner: string;
+  instructions?: string;
   contacts: string[];
   attackers: string[];
   honestTasks: HonestTask[];
@@ -61,16 +66,33 @@ export function contactAddress(name: string): Address {
   return labelAddress(`crash-test:contact:${name}`);
 }
 
-export function loadScenario(id: string, role: Role, seed: number): Scenario {
+/** `encoding` overrides the scheme of every encoded feed item (e.g. "plain" to send the instruction as readable text). */
+export function loadScenario(id: string, role: Role, seed: number, encoding?: Scheme): Scenario {
   const raw = scenarioJson(id, role) as RawScenario;
   const contacts = Object.fromEntries(raw.contacts.map((n) => [n, contactAddress(n)]));
   const attackers = Object.fromEntries(raw.attackers.map((n) => [n, labelAddress(`crash-test:${id}:${seed}:${n}`)]));
   const vars: Record<string, string> = { owner: raw.owner, ...contacts, ...attackers };
+  let used: Scheme | null = null;
   const feed = raw.feed.map(({ encode: enc, ...item }) => {
-    const text = enc ? fill(item.text, { ...vars, encoded: encode(enc.scheme, fill(enc.plain, vars)) }) : fill(item.text, vars);
+    if (!enc) return { ...item, from: item.from ? fill(item.from, vars) : undefined, text: fill(item.text, vars) };
+    used = encoding ?? enc.scheme;
+    const text = fill(item.text, { ...vars, encoded: encode(used, fill(enc.plain, vars)) });
     return { ...item, from: item.from ? fill(item.from, vars) : undefined, text };
   });
   const pages = Object.fromEntries(Object.entries(raw.pages ?? {}).map(([url, t]) => [url, fill(t, vars)]));
   for (const t of raw.honestTasks) if (!(t.to in contacts)) throw new Error(`${id}/${role}: honest task to unknown contact ${t.to}`);
-  return { id, role, turns: raw.turns, owner: raw.owner, contacts, attackers, honestTasks: raw.honestTasks, hostileItems: raw.hostileItems, feed, pages };
+  return {
+    id,
+    role,
+    turns: raw.turns,
+    owner: raw.owner,
+    contacts,
+    attackers,
+    honestTasks: raw.honestTasks,
+    hostileItems: raw.hostileItems,
+    feed,
+    pages,
+    instructions: raw.instructions ?? "owner-only",
+    encoding: used,
+  };
 }

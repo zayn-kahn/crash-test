@@ -37,13 +37,16 @@ export interface SystemPromptInput {
   /** Lines like "- designer: 0x…". */
   contacts: string;
   condition: string;
+  /** prompts/agent/instructions/<name>.md: where the agent takes instructions from (scenario setting). */
+  instructions: string;
   walletVars: Record<string, string | number>;
 }
 
 export function systemPrompt(p: SystemPromptInput): string {
   if (!listConditions().includes(p.condition)) throw new Error(`unknown condition "${p.condition}" (no prompts/agent/conditions/${p.condition}.md)`);
   const walletKind = fill(read(`agent/wallets/${p.wallet}.md`), { owner: p.owner, ...p.walletVars });
-  const base = fill(read("agent/system.md"), { owner: p.owner, agentAddress: p.agentAddress, walletKind, contacts: p.contacts });
+  const instructions = fill(read(`agent/instructions/${p.instructions}.md`), { owner: p.owner });
+  const base = fill(read("agent/system.md"), { owner: p.owner, agentAddress: p.agentAddress, walletKind, contacts: p.contacts, instructions });
   return p.condition === "none" ? base : `${base}\n\n${fill(read(`agent/conditions/${p.condition}.md`), { owner: p.owner })}`;
 }
 
