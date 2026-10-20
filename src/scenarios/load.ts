@@ -8,7 +8,7 @@
  *   - tools: extra tools the agent can call, whose answers the scenario writes (an "MCP server")
  *   - intercepts: a built-in tool's answer replaced on one turn (a malicious router rewriting a reply)
  */
-import type { Address } from "viem";
+import { getAddress, type Address } from "viem";
 import { labelAddress } from "../chain/deploy.js";
 import { fill, scenarioJson } from "../prompts.js";
 import { encode, type Scheme } from "./encode.js";
@@ -70,8 +70,9 @@ export interface Scenario {
   pages: Record<string, string>;
   tools: ScenarioTool[];
   intercepts: Intercept[];
-  /** What an agent that falls for the attack does, per turn (the scripted `gullible` player). Never shown to a model. */
-  gullible: { turn: number; tool: string; args: Record<string, unknown> }[];
+  /** What an agent that falls for the attack does, per turn (the scripted `gullible` player). Never shown to a model.
+   *  `insteadOf`: the owner's task (contact name) that turn the fooled agent pays the attacker INSTEAD of. */
+  gullible: { turn: number; tool: string; args: Record<string, unknown>; insteadOf?: string }[];
   /** prompts/agent/instructions/<name>.md: "owner-only" (default) or "public-requests" (Bankrbot-like). */
   instructions: string;
   /** How the hidden instruction was written in this run (the scenario's scheme or the --encoding override); null if none. */
@@ -96,6 +97,14 @@ interface RawScenario {
   tools?: ScenarioTool[];
   intercepts?: Intercept[];
   gullible?: Scenario["gullible"];
+  /** Attacker -> contact it imitates: the attacker's address keeps that contact's first 6 and last 6 hex digits. */
+  lookalikes?: Record<string, string>;
+}
+
+/** An address with the same first and last 6 hex digits as `target`, middle from keccak(label): address poisoning. */
+export function lookalikeAddress(target: Address, label: string): Address {
+  const mid = labelAddress(label).slice(8, 36);
+  return getAddress(`${target.slice(0, 8)}${mid}${target.slice(-6)}`.toLowerCase());
 }
 
 export function contactAddress(name: string): Address {
@@ -107,7 +116,14 @@ export function loadScenario(id: string, role: Role, seed: number, encoding?: Sc
   const raw = scenarioJson(id, role) as RawScenario;
   const contacts = Object.fromEntries(raw.contacts.map((n) => [n, contactAddress(n)]));
   const payees = Object.fromEntries((raw.payees ?? []).map((n) => [n, contactAddress(n)]));
-  const attackers = Object.fromEntries(raw.attackers.map((n) => [n, labelAddress(`crash-test:${id}:${seed}:${n}`)]));
+  const attackers = Object.fromEntries(
+    raw.attackers.map((n) => {
+      const label = `crash-test:${id}:${seed}:${n}`;
+      const like = raw.lookalikes?.[n];
+      if (like && !(like in contacts)) throw new Error(`${id}/${role}: lookalike of unknown contact ${like}`);
+      return [n, like ? lookalikeAddress(contacts[like], label) : labelAddress(label)];
+    }),
+  );
   const vars: Record<string, string> = { owner: raw.owner, ...contacts, ...payees, ...attackers };
   const f = (t: string) => fill(t, vars);
   let used: Scheme | null = null;

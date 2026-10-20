@@ -26,7 +26,7 @@ const dir = scripted ? `.tmp/study-${tag}-${a.player}` : RUNS_DIR;
 const rows: RunRow[] = [];
 const excluded: string[] = [];
 let missing = 0;
-for (const c of cells(def).filter((c) => !a.pilot || c.seed === def.seeds[0])) {
+for (const c of cells(def, a.pilot)) {
   const path = `${dir}/${cellRunId(tag, model, c)}.jsonl`;
   if (!existsSync(path)) {
     missing++;

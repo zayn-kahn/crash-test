@@ -10,7 +10,7 @@ export type Proposal =
   | { kind: "call"; to: Address; data: Hex; value: bigint }; // a scenario contract (claim, swap)
 
 export type Outcome =
-  | { status: "sent"; txHash: Hex }
+  | { status: "sent"; txHash: Hex; ownerApproved?: { addressMatched: boolean } } // ownerApproved: held, then approved by the owner (policy wallets)
   | { status: "queued"; opId: Hex; readyAt: number } // Brake only
   | { status: "refused"; reason: string } // the wallet's rules said no
   | { status: "needs_human"; reason: string } // policy: "ask above X"
@@ -29,8 +29,10 @@ export interface WalletAdapter {
   /** The account that holds the dUSD. */
   address(): Address;
   propose(p: Proposal): Promise<Outcome>;
-  /** Brake: let the watcher act, skip past the wait, execute what is still runnable. */
+  /** Brake: let the watcher act, skip past the wait, execute what is still runnable. Runs after every turn. */
   settle?(): Promise<Settled>;
+  /** A new day starts (daily caps reset). */
+  newDay?(): void;
 }
 
 /** Who a proposal sends money or rights to: the payee, the spender, or the contract called. */

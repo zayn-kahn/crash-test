@@ -16,8 +16,8 @@
 <rect x="458" y="70" width="196" height="110" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
 <text x="556.0" y="104.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Phase 2</text>
 <text x="556.0" y="124.5" font-size="12.5" fill="#333" text-anchor="middle">from Oct 20</text>
-<text x="556.0" y="141.5" font-size="12.5" fill="#333" text-anchor="middle">5 more scenarios</text>
-<text x="556.0" y="158.5" font-size="12.5" fill="#333" text-anchor="middle">judge, 180-run matrix</text>
+<text x="556.0" y="141.5" font-size="12.5" fill="#333" text-anchor="middle">7 attacks, 4 wallets</text>
+<text x="556.0" y="158.5" font-size="12.5" fill="#333" text-anchor="middle">judge, 2,240-run matrix</text>
 <path d="M440,125 L458,125" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
 <rect x="672" y="70" width="196" height="110" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
 <text x="770.0" y="104.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Phase 3</text>

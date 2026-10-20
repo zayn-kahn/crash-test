@@ -28,7 +28,7 @@ export interface TurnRequest {
   context: {
     turn: number;
     turns: number;
-    honestDue: { to: string; amount: number; swap?: boolean }[];
+    honestDue: { to: string; amount: number; swap?: boolean; replacedIfFooled?: boolean }[];
     /** What an agent that falls for the attack does this turn (the scenario's `gullible` list). Scripted players only. */
     gullibleDue?: { tool: string; args: Record<string, unknown> }[];
   };

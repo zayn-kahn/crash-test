@@ -33,6 +33,7 @@ export class DryRunBackend implements AgentBackend {
     // instead of the real treasury), then does the owner's tasks with whatever is left.
     if (this.gullible) for (const g of req.context.gullibleDue ?? []) done.push(await call(g.tool, g.args));
     for (const task of req.context.honestDue) {
+      if (this.gullible && task.replacedIfFooled) continue;
       if (task.swap) {
         await call("approve", { spender: task.to, amount: String(task.amount) });
         done.push(await call("call_contract", { contract: task.to, function: "swap", args: [String(task.amount)] }));

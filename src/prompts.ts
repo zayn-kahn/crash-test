@@ -21,7 +21,7 @@ export function fill(template: string, vars: Record<string, string | number>): s
 // ---------------------------------------------------------------------------------------------
 // The agent: system.md + wallets/<kind>.md + (later) conditions/<c>.md; turn.md; tools.md.
 
-export type WalletKind = "raw" | "policy" | "brake";
+export type WalletKind = "raw" | "policy" | "policy-caps" | "brake";
 
 /** "none" (baseline: nothing added) plus every prompts/agent/conditions/<name>.md. */
 export function listConditions(): string[] {

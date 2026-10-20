@@ -58,6 +58,7 @@ function runSummary(id: string) {
     id,
     startedAt: ev[0]?.ts ?? null,
     scenario: start.scenario,
+    study: start.study ?? null,
     role: start.role,
     wallet: start.wallet,
     watcher: start.watcher,

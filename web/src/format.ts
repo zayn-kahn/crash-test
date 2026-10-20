@@ -39,6 +39,7 @@ export function walletLabel(wallet?: string, watcher?: string | null): string {
   if (wallet === "raw") return "Raw key";
   if (wallet === "brake") return watcher === "cancel-unknown" ? "Brake + watcher" : "Brake, no watcher";
   if (wallet === "policy") return "Policy wallet";
+  if (wallet === "policy-caps") return "Policy, caps only";
   return wallet ?? "?";
 }
 

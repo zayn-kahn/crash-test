@@ -101,7 +101,7 @@ s.save("architecture-run.svg")
 # 2. The three wallets --------------------------------------------------------------------------
 s = Svg(1120, 720, "2. What each wallet does with the agent's proposal")
 s.box(385, 60, 350, 70, "Agent's proposal", ["pay, approve or contract call"], "agent")
-cols = [(40, "Raw key"), (405, "Policy wallet"), (770, "Brake (ERC-7579 module)")]
+cols = [(40, "Raw key"), (405, "Policy wallets"), (770, "Brake (ERC-7579 module)")]
 CWD = 310
 for x, name in cols:
     s.box(x, 190, CWD, 64, name, [], "chain")
@@ -110,7 +110,7 @@ for x, name in cols:
 s.box(40, 300, CWD, 70, "Sent at once", ["no checks of any kind"], "bad")
 s.arrow([(195, 254), (195, 300)])
 # policy
-s.box(405, 300, CWD, 150, "Checks", ["per payment up to 500 dUSD", "up to 800 dUSD a day", "only trusted contacts", "swap/claim on contacts only", "ask a human above 250"], "truth")
+s.box(405, 300, CWD, 150, "Checks", ["per payment up to 500 dUSD", "up to 800 dUSD a day", "allowlist (policy only)", "only swap / claim calls", "owner taps above 250"], "truth")
 s.arrow([(560, 254), (560, 300)])
 pw = 96
 for i, (lab, kind) in enumerate((("sent", "good"), ("refused", "bad"), ("to human", "out"))):
@@ -118,7 +118,7 @@ for i, (lab, kind) in enumerate((("sent", "good"), ("refused", "bad"), ("to huma
     s.box(bx, 510, pw, 54, lab, [], kind)
     s.arrow([(560, 450), (560, 480), (bx + pw / 2, 480), (bx + pw / 2, 510)])
 # brake
-s.box(770, 300, CWD, 70, "Trusted contact, under cap?", ["daily cap 300 dUSD"], "truth")
+s.box(770, 300, CWD, 70, "Trusted contact, under cap?", ["daily cap 800 dUSD"], "truth")
 s.arrow([(925, 254), (925, 300)])
 s.box(770, 420, 120, 54, "sent now", [], "good")
 s.arrow([(830, 370), (830, 420)], "yes", (830, 399))
@@ -137,7 +137,7 @@ s = Svg(1120, 420, "3. From many runs to one published result")
 W, H = 230, 100
 xs = [30, 310, 590, 860]
 y1, y2 = 70, 270
-s.box(xs[0], y1, W, H, "Matrix file", ["6 scenarios x attack/twin", "x 3 wallets x 5 seeds", "x models x conditions"], "input")
+s.box(xs[0], y1, W, H, "Matrix file", ["7 attacks x attack/twin", "x 2 sources x 4 wallets", "x 20 seeds"], "input")
 s.box(xs[1], y1, W, H, "Runs", ["4 at once, own Anvil each", "resumable", "stops at the USD cap"], "chain")
 s.box(xs[2], y1, W, H, "Run logs", ["one JSONL per run", "chain truth inside"], "out")
 s.box(xs[3], y1, W, H, "Blind judge", ["JSON verdict per run", "flagged? declined? warned?"], "truth")
@@ -156,7 +156,7 @@ s = Svg(1120, 210, "4. The plan: Oct 20 to Nov 10")
 phases = [
     ("Phase 0", "Oct 20", ["setup, Claude backend", "Brake 90 tests"], "good"),
     ("Phase 1", "Oct 20", ["chain + 3 wallets", "grok spike: 21 runs"], "good"),
-    ("Phase 2", "from Oct 20", ["5 more scenarios", "judge, 180-run matrix"], "out"),
+    ("Phase 2", "from Oct 20", ["7 attacks, 4 wallets", "judge, 2,240-run matrix"], "out"),
     ("Phase 3", "Nov 1-7", ["Sonnet + rules prompt", "pre-registered matrix"], "out"),
     ("Phase 4", "Nov 8-10", ["write-up, dataset", "outreach, grants"], "out"),
 ]
