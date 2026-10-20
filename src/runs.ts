@@ -20,12 +20,17 @@ export function isDryRun(logPath: string): boolean {
 }
 
 /**
- * USD spent by every model run logged in data/runs/ (turn_usage events, so crashed runs count too).
- * The spend guard compares this with MAX_USD.
+ * USD spent by every model run logged in data/runs/ (turn_usage events, so crashed runs count too) plus every
+ * judge call (<id>.judge.json costUsd). The spend guard compares this with MAX_USD.
  */
 export function spentUsd(logDir = RUNS_DIR): number {
   if (!existsSync(logDir)) return 0;
   let total = 0;
+  for (const f of readdirSync(logDir).filter((x) => x.endsWith(".judge.json"))) {
+    try {
+      total += Number(JSON.parse(readFileSync(join(logDir, f), "utf8")).costUsd ?? 0);
+    } catch {}
+  }
   for (const f of readdirSync(logDir).filter((x) => x.endsWith(".jsonl"))) {
     for (const line of readFileSync(join(logDir, f), "utf8").split("\n")) {
       if (!line.includes('"turn_usage"')) continue;

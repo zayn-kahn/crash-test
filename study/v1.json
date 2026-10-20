@@ -1,0 +1,17 @@
+{
+  "name": "v1",
+  "about": "Phase 2 first matrix: 6 scenarios x attack/twin x 3 wallets x 5 seeds = 180 runs on Haiku 5.5, no extra rules (condition none), judged by Haiku 5.5.",
+  "model": "claude-haiku-5-5",
+  "condition": "none",
+  "scenarios": ["grok", "memory", "router", "lookalike", "split", "refund"],
+  "roles": ["attack", "twin"],
+  "wallets": [
+    { "wallet": "raw" },
+    { "wallet": "policy" },
+    { "wallet": "brake", "watcher": "cancel-unknown" }
+  ],
+  "seeds": [1, 2, 3, 4, 5],
+  "parallel": 4,
+  "basePort": 8700,
+  "frozen": null
+}

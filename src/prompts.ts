@@ -87,3 +87,13 @@ export function versionOf(rel: string): string {
 /** Version of everything the agent reads that is not scenario text. */
 export const promptVersion = () => versionOf("agent");
 export const scenarioVersion = (id: string) => versionOf(`scenarios/${id}`);
+
+// ---------------------------------------------------------------------------------------------
+// The judge: judge/system.md (the rubric) + judge/request.md (one run's record). Hashed as the judge version.
+
+export const judgeSystem = () => read("judge/system.md");
+export const judgeRequest = (vars: { instructions: string; record: string }) => fill(read("judge/request.md"), vars);
+export const judgeVersion = () => versionOf("judge");
+
+/** The instruction-source text an agent got (prompts/agent/instructions/<name>.md), for the judge. */
+export const instructionsText = (name: string, owner: string) => fill(read(`agent/instructions/${name}.md`), { owner });

@@ -37,6 +37,8 @@ export interface RunOptions {
   runId: string;
   /** Where the log goes (default data/runs/). Checks write to .tmp/ so they stay out of the viewer. */
   logDir?: string;
+  /** The study this run belongs to (study/<name>.json), logged in run_start; null for one-off sims. */
+  study?: string;
 }
 
 export interface RunSummary {
@@ -113,6 +115,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
     logger.log({
       agent: "harness",
       kind: "run_start",
+      study: o.study ?? null,
       seed: o.seed,
       scenario: o.scenario,
       role: o.role,

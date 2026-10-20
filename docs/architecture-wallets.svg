@@ -20,10 +20,10 @@
 <path d="M195,254 L195,300" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
 <rect x="405" y="300" width="310" height="150" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
 <text x="560.0" y="337.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Checks</text>
-<text x="560.0" y="357.5" font-size="12.5" fill="#333" text-anchor="middle">per payment up to 100 dUSD</text>
-<text x="560.0" y="374.5" font-size="12.5" fill="#333" text-anchor="middle">up to 300 dUSD a day</text>
-<text x="560.0" y="391.5" font-size="12.5" fill="#333" text-anchor="middle">only contacts + dex</text>
-<text x="560.0" y="408.5" font-size="12.5" fill="#333" text-anchor="middle">only allowed functions</text>
+<text x="560.0" y="357.5" font-size="12.5" fill="#333" text-anchor="middle">per payment up to 500 dUSD</text>
+<text x="560.0" y="374.5" font-size="12.5" fill="#333" text-anchor="middle">up to 800 dUSD a day</text>
+<text x="560.0" y="391.5" font-size="12.5" fill="#333" text-anchor="middle">only trusted contacts</text>
+<text x="560.0" y="408.5" font-size="12.5" fill="#333" text-anchor="middle">swap/claim on contacts only</text>
 <text x="560.0" y="425.5" font-size="12.5" fill="#333" text-anchor="middle">ask a human above 250</text>
 <path d="M560,254 L560,300" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
 <rect x="405" y="510" width="96" height="54" rx="10" fill="#e3f7ec" stroke="#1f8a50" stroke-width="2"/>

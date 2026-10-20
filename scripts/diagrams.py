@@ -110,7 +110,7 @@ for x, name in cols:
 s.box(40, 300, CWD, 70, "Sent at once", ["no checks of any kind"], "bad")
 s.arrow([(195, 254), (195, 300)])
 # policy
-s.box(405, 300, CWD, 150, "Checks", ["per payment up to 100 dUSD", "up to 300 dUSD a day", "only contacts + dex", "only allowed functions", "ask a human above 250"], "truth")
+s.box(405, 300, CWD, 150, "Checks", ["per payment up to 500 dUSD", "up to 800 dUSD a day", "only trusted contacts", "swap/claim on contacts only", "ask a human above 250"], "truth")
 s.arrow([(560, 254), (560, 300)])
 pw = 96
 for i, (lab, kind) in enumerate((("sent", "good"), ("refused", "bad"), ("to human", "out"))):
@@ -140,9 +140,9 @@ y1, y2 = 70, 270
 s.box(xs[0], y1, W, H, "Matrix file", ["6 scenarios x attack/twin", "x 3 wallets x 5 seeds", "x models x conditions"], "input")
 s.box(xs[1], y1, W, H, "Runs", ["4 at once, own Anvil each", "resumable", "stops at the USD cap"], "chain")
 s.box(xs[2], y1, W, H, "Run logs", ["one JSONL per run", "chain truth inside"], "out")
-s.box(xs[3], y1, W, H, "Blind judge", ["JSON verdict per run", "noticed? refused? warned?"], "truth")
+s.box(xs[3], y1, W, H, "Blind judge", ["JSON verdict per run", "flagged? declined? warned?"], "truth")
 s.box(xs[0], y2, W, H, "Judge check", ["seeded 10% hand-labelled", "agreement (kappa) >= 0.7"], "truth")
-s.box(xs[1], y2, W, H, "Analyze", ["leak rate with CIs", "false-refusal rate", "per wallet and scenario"], "truth")
+s.box(xs[1], y2, W, H, "Analyze", ["leak rate with CIs", "agent fooled vs wallet", "refused vs blocked"], "truth")
 s.box(xs[2], y2, W, H, "Results", ["docs/results/*.md", "scorecard JSON"], "out")
 s.box(xs[3], y2, W, H, "Publish if earned", ["dataset, write-up", "public copy of the folder"], "good")
 for a, b in ((0, 1), (1, 2), (2, 3)):
@@ -154,9 +154,9 @@ s.save("architecture-study.svg")
 # 4. The phases ---------------------------------------------------------------------------------
 s = Svg(1120, 210, "4. The plan: Oct 20 to Nov 10")
 phases = [
-    ("Phase 0", "Oct 20-21", ["setup, Claude backend", "Brake 90 tests"], "good"),
-    ("Phase 1", "Oct 21-23", ["chain + 3 wallets", "scenario 1, 6 runs"], "out"),
-    ("Phase 2", "Oct 24-31", ["5 more scenarios", "judge, 180-run matrix"], "out"),
+    ("Phase 0", "Oct 20", ["setup, Claude backend", "Brake 90 tests"], "good"),
+    ("Phase 1", "Oct 20", ["chain + 3 wallets", "grok spike: 21 runs"], "good"),
+    ("Phase 2", "from Oct 20", ["5 more scenarios", "judge, 180-run matrix"], "out"),
     ("Phase 3", "Nov 1-7", ["Sonnet + rules prompt", "pre-registered matrix"], "out"),
     ("Phase 4", "Nov 8-10", ["write-up, dataset", "outreach, grants"], "out"),
 ]
@@ -166,7 +166,7 @@ for i, (name, dates, lines, kind) in enumerate(phases):
     s.box(x, 70, W, 110, name, [dates] + lines, kind)
     if i:
         s.arrow([(x - gap, 125), (x, 125)])
-s.parts.append('<rect x="30" y="58" width="196" height="8" fill="#1f8a50"/>')
-s.text(232, 66, "done", 12, "#1f8a50", bold=True)
+s.parts.append('<rect x="30" y="58" width="410" height="8" fill="#1f8a50"/>')
+s.text(446, 66, "done", 12, "#1f8a50", bold=True)
 s.save("architecture-phases.svg")
 print("ok")
