@@ -46,7 +46,7 @@ const wallets: [WalletKind, WatcherPolicy][] = [
  * Memory's 500 waits for the owner, who asked for a 500 payment that day and approves it without reading the
  * address (ownerChecksAddress: false): that one proves the owner-approval path.
  */
-const CAPS_LEAK = new Set(["grok", "grok-public", "memory", "lookalike", "split", "spoof"]);
+const CAPS_LEAK = new Set(["grok", "grok-public", "memory", "lookalike", "split", "spoof", "memory-hard", "spoof-hard", "router-hard", "bec"]);
 const cases: Case[] = [];
 for (const scenario of scenarios)
   for (const [wallet, watcher] of wallets) {

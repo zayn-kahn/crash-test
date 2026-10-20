@@ -82,6 +82,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
     const trusted = Object.values(scenario.contacts);
     const named = { ...scenario.contacts, ...scenario.payees };
     const world = new World();
+    world.notes.push(...scenario.notes); // a scenario may start with notes in memory (memory-hard)
     let turn = 0;
 
     // --- scenario contracts, placed at their contact's address --------------------------------------
@@ -171,6 +172,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
       contracts: scenario.contracts,
       attackers: attackerLabels,
       honestTasks: scenario.honestTasks,
+      startNotes: scenario.notes,
       hostileItems: scenario.hostileItems,
       scenarioTools: scenario.tools.map((t) => t.name),
       intercepts: scenario.intercepts.map((x) => ({ turn: x.turn, tool: x.tool })),

@@ -1,20 +1,70 @@
 {
   "name": "v1",
-  "about": "Phase 2 first matrix on Haiku 5.5: 7 scenarios x attack/twin x 2 instruction sources x 4 wallets x 20 seeds = 2,240 runs, no extra rules (condition none). Seeds fix addresses, not the model's sampling: each run is one draw.",
+  "about": "Phase 2 first matrix on Haiku 5.5: 11 attacks (7 plain, 4 hard: added after the plain pilot leaked 0 of 56) x attack/twin x 2 instruction sources x 4 wallets x 20 seeds = 3,520 runs, no extra rules (condition none). Seeds fix addresses, not the model's sampling: each run is one draw.",
   "model": "claude-haiku-5-5",
   "judgeModel": "claude-haiku-5-5",
   "condition": "none",
-  "scenarios": ["grok", "memory", "router", "lookalike", "split", "refund", "spoof"],
-  "roles": ["attack", "twin"],
-  "instructions": ["owner-only", "public-requests"],
-  "wallets": [
-    { "wallet": "raw" },
-    { "wallet": "policy" },
-    { "wallet": "policy-caps" },
-    { "wallet": "brake", "watcher": "cancel-unknown" }
+  "scenarios": [
+    "grok",
+    "memory",
+    "router",
+    "lookalike",
+    "split",
+    "refund",
+    "spoof",
+    "memory-hard",
+    "spoof-hard",
+    "router-hard",
+    "bec"
   ],
-  "seeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-  "pilotSeeds": [1],
+  "roles": [
+    "attack",
+    "twin"
+  ],
+  "instructions": [
+    "owner-only",
+    "public-requests"
+  ],
+  "wallets": [
+    {
+      "wallet": "raw"
+    },
+    {
+      "wallet": "policy"
+    },
+    {
+      "wallet": "policy-caps"
+    },
+    {
+      "wallet": "brake",
+      "watcher": "cancel-unknown"
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "pilotSeeds": [
+    1
+  ],
   "parallel": 6,
   "basePort": 8700,
   "frozen": null

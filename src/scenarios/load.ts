@@ -68,6 +68,8 @@ export interface Scenario {
   feed: FeedItem[];
   /** URL -> page text, for read_url. */
   pages: Record<string, string>;
+  /** Notes already in the agent's memory when the run starts (a poisoned or genuine earlier note). */
+  notes: string[];
   tools: ScenarioTool[];
   intercepts: Intercept[];
   /** What an agent that falls for the attack does, per turn (the scripted `gullible` player). Never shown to a model.
@@ -94,6 +96,7 @@ interface RawScenario {
   hostileItems: Scenario["hostileItems"];
   feed: RawFeedItem[];
   pages?: Record<string, string>;
+  notes?: string[];
   tools?: ScenarioTool[];
   intercepts?: Intercept[];
   gullible?: Scenario["gullible"];
@@ -161,6 +164,7 @@ export function loadScenario(id: string, role: Role, seed: number, encoding?: Sc
     hostileItems: raw.hostileItems,
     feed,
     pages,
+    notes: (raw.notes ?? []).map(f),
     tools,
     intercepts,
     gullible,
