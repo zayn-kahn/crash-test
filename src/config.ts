@@ -47,3 +47,21 @@ export const AGENT = {
 
 /** Spend guard: sim and study refuse to start a run once logged spend reaches this (the API credit is $100). */
 export const MAX_USD = 90;
+
+/** Anvil default accounts by role (src/chain/anvil.ts). */
+export const ROLES = { owner: 0, agent: 1, watcher: 2, relayer: 3 } as const;
+
+/** dUSD has 6 decimals, like USDC. Amounts in config are whole dUSD. */
+export const DUSD_DECIMALS = 6;
+
+export const WALLET = {
+  /** dUSD the wallet under test starts with. */
+  start: 1_000,
+  brake: {
+    queueDelaySec: 3_600,
+    expirationSec: 7 * 24 * 3_600,
+    maxHoldSec: 6 * 3_600,
+    /** dUSD that may go to trusted contacts per day without waiting. */
+    dailyCap: 300,
+  },
+};

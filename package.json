@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build:contracts": "forge build --root contracts",
+    "test:contracts": "forge test --root contracts",
     "test:brake": "forge test --root contracts/lib/brake/contracts/brake",
+    "check:wallets": "forge build --root contracts && tsx scripts/check-wallets.ts",
     "typecheck": "tsc --noEmit",
     "models": "tsx scripts/models.ts",
     "clean": "tsx scripts/clean.ts"

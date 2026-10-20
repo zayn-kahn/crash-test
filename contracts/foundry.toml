@@ -1,0 +1,16 @@
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.27"
+evm_version = "cancun"
+remappings = [
+  "@openzeppelin/contracts/=lib/brake/contracts/brake/lib/openzeppelin-contracts/contracts/",
+  "@openzeppelin/community-contracts/=lib/brake/contracts/brake/lib/openzeppelin-community-contracts/contracts/",
+  "forge-std/=lib/brake/contracts/brake/lib/forge-std/src/",
+  "brake/=lib/brake/contracts/brake/src/",
+]
+
+[lint]
+lint_on_build = false
