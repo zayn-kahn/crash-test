@@ -32,7 +32,20 @@ export function modelLabel(model?: string): string {
   if (model === "dry-run") return "Scripted test agent";
   if (model === "gullible") return "Scripted gullible agent";
   const m = model.match(/^claude-(\w+)-(\d+)-(\d+)$/);
-  return m ? `Claude ${m[1][0].toUpperCase()}${m[1].slice(1)} ${m[2]}.${m[3]}` : model;
+  if (m) return `Claude ${m[1][0].toUpperCase()}${m[1].slice(1)} ${m[2]}.${m[3]}`;
+  // OpenRouter ids ("openai/gpt-5-mini"): a readable name for the ones we run, else the part after the slash.
+  const known: Record<string, string> = {
+    "openai/gpt-5-mini": "GPT-5 mini",
+    "deepseek/deepseek-v4.1-flash": "DeepSeek V4.1 Flash",
+    "z-ai/glm-5.3-flash": "GLM 5.3 Flash",
+    "meta-llama/llama-4-scout": "Llama 4 Scout",
+    "google/gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite",
+    "mistralai/mistral-small-2603": "Mistral Small",
+    "qwen/qwen3.7-plus": "Qwen 3.7 Plus",
+    "google/gemma-4-26b-a4b-it": "Gemma 4 26B",
+    "qwen/qwen3.5-9b": "Qwen 3.5 9B",
+  };
+  return known[model] ?? model.split("/").pop() ?? model;
 }
 
 export function walletLabel(wallet?: string, watcher?: string | null): string {
