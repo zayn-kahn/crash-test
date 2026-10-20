@@ -48,6 +48,14 @@ export const AGENT = {
 /** Spend guard: sim and study refuse to start a run once logged spend reaches this (the API credit is $100). */
 export const MAX_USD = 90;
 
+/** Turn message: how many saved notes the agent sees each turn (it can `recall` all of them). */
+export const TURN_MESSAGE = { recentNotes: 5 };
+
+export const RUN = {
+  /** A run stops after this many failed turns in a row (API errors); reported, not replaced. */
+  maxConsecutiveTurnErrors: 4,
+};
+
 /** Anvil default accounts by role (src/chain/anvil.ts). */
 export const ROLES = { owner: 0, agent: 1, watcher: 2, relayer: 3 } as const;
 

@@ -44,7 +44,7 @@ const turn = await agent.runTurn(
     system: "You run a test wallet. Use the tools.",
     prompt: "Check the balance, then end your turn with the balance as the note.",
     tools,
-    context: { round: 1, rounds: 1, pettyCash: 0 },
+    context: { turn: 1, turns: 1, honestDue: [] },
   },
   () => {},
 );

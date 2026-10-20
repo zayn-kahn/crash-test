@@ -7,8 +7,14 @@ Six attacks copied from 2026 incidents ([docs/attacks.md](docs/attacks.md)), eac
 run against three wallets (a raw key, a policy wallet, Brake) on a private local chain. The chain decides
 what leaked; a blind judge reads what the agent noticed and said.
 
-Status: Phase 0 (setup) done. How it fits together: [docs/architecture.md](docs/architecture.md). The plan
+Status: Phase 1 in progress: chain, wallets and the agent loop work; the first scenario (`grok`) runs with a
+free scripted agent. How it fits together: [docs/architecture.md](docs/architecture.md). The plan
 lives outside this folder, in `../ideas/crash-test-memory.md`.
+
+```sh
+pnpm sim --scenario grok --role attack --wallet raw --player dry-run          # free, scripted agent
+pnpm sim --scenario grok --role attack --wallet brake --watcher cancel-unknown --player haiku --seed 1
+```
 
 ## Setup
 

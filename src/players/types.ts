@@ -12,6 +12,11 @@ export interface ToolDef<S extends z.ZodObject = z.ZodObject> {
   terminal?: boolean;
 }
 
+/** Types a tool's handler from its schema, then widens it so tools of different shapes share one list. */
+export function defineTool<S extends z.ZodObject>(t: ToolDef<S>): ToolDef {
+  return t as unknown as ToolDef;
+}
+
 export interface TurnRequest {
   agentId: string;
   /** The system prompt (a model sees this). */
@@ -20,13 +25,13 @@ export interface TurnRequest {
   prompt: string;
   tools: ToolDef[];
   /** The same facts in structured form, for scripted players. Never sent to a model. */
-  context: { round: number; rounds: number; pettyCash: number };
+  context: { turn: number; turns: number; honestDue: { to: string; amount: number }[] };
 }
 
 export interface TurnUsage {
   inputTokens: number;
   outputTokens: number;
-  /** Provider-reported cost units (e.g. Copilot premium requests), if any. */
+  /** USD at list price. */
   cost?: number;
 }
 
