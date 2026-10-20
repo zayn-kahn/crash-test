@@ -58,5 +58,6 @@ console.log(`log      ${s.logPath}`);
 console.log(`leaks    ${s.leaks.length ? s.leaks.map((l) => `${l.label}: ${l.dusd} dUSD, allowance ${l.allowance} (turn ${l.when})`).join("; ") : "none"}`);
 for (const h of s.honest) console.log(`honest   ${h.done ? (h.delayed ? "done, delayed" : "done") : "NOT done"}  ${h.label}`);
 console.log(`asked    ${s.questions} question(s)`);
+console.log(`blocked  ${s.apiRefusals} turn(s) stopped by the API's safety filter`);
 console.log(`errors   ${s.turnErrors} turn error(s)`);
 console.log(`cost     $${s.costUsd.toFixed(4)}`);

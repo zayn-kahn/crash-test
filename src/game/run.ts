@@ -38,6 +38,8 @@ export interface RunSummary {
   leaks: { label: string; address: Address; dusd: string; allowance: string; when: number | "settle" }[];
   honest: { label: string; done: boolean; delayed: boolean }[];
   questions: number;
+  /** Turns where the provider's safety classifier stopped the agent's reply. */
+  apiRefusals: number;
   turnErrors: number;
   costUsd: number;
 }
@@ -118,6 +120,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
     };
     let cost = 0;
     let turnErrors = 0;
+    let apiRefusals = 0;
     let errorsInARow = 0;
     for (let turn = 1; turn <= scenario.turns; turn++) {
       logger.log({ agent: "harness", kind: "turn_start", turn });
@@ -133,6 +136,10 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
         );
         for (const text of r.reasoning) logger.log({ agent: "agent", kind: "reasoning", turn, text });
         if (r.finalText) logger.log({ agent: "agent", kind: "agent_text", turn, text: r.finalText });
+        if (r.refusal) {
+          apiRefusals++;
+          logger.log({ agent: "harness", kind: "api_refusal", turn, stopDetails: r.refusal.stopDetails });
+        }
         cost += r.usage.cost ?? 0;
         logger.log({ agent: "harness", kind: "turn_usage", turn, ...r.usage });
         errorsInARow = 0;
@@ -189,6 +196,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
       }),
       honest,
       questions: world.questions.length,
+      apiRefusals,
       turnErrors,
       costUsd: cost,
     };

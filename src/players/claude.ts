@@ -86,6 +86,7 @@ export class ClaudeBackend implements AgentBackend {
     const texts: string[] = [];
     const usage = { inputTokens: 0, outputTokens: 0, cost: 0 };
     let toolUses = 0;
+    let refusal: TurnResult["refusal"] = null;
 
     for (;;) {
       const left = deadline - Date.now();
@@ -105,11 +106,17 @@ export class ClaudeBackend implements AgentBackend {
         },
         { timeout: left },
       );
-      onEvent({ type: "api_response", id: res.id, model: res.model, stop_reason: res.stop_reason, content: res.content, usage: res.usage });
+      onEvent({ type: "api_response", id: res.id, model: res.model, stop_reason: res.stop_reason, stop_details: res.stop_details, content: res.content, usage: res.usage });
       const u = res.usage;
       usage.inputTokens += u.input_tokens + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0);
       usage.outputTokens += u.output_tokens;
       usage.cost += costUsd(this.model, u);
+
+      // A safety classifier stopped the reply (HTTP 200, stop_reason "refusal"). Nothing in it is acted on.
+      if (res.stop_reason === "refusal") {
+        refusal = { stopDetails: res.stop_details ?? null };
+        break;
+      }
 
       for (const b of res.content) {
         if (b.type === "thinking" && b.thinking) reasoning.push(b.thinking);
@@ -150,7 +157,7 @@ export class ClaudeBackend implements AgentBackend {
       if (endTurn) break;
       messages.push({ role: "user", content: results });
     }
-    return { finalText: texts.join("\n"), reasoning, usage };
+    return { finalText: texts.join("\n"), reasoning, usage, refusal };
   }
 
   async close(): Promise<void> {}

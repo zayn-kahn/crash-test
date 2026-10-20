@@ -90,6 +90,7 @@ ul.tools li.ask { background: var(--amber-bg); }
 .result { color: #3a3a3d; font-size: 13px; margin-top: 3px; word-break: break-word; }
 .chain { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 14px; }
 .alert { margin-top: 10px; background: var(--red-bg); color: var(--red); border-radius: 10px; padding: 10px 12px; font-weight: 600; }
+.filter { background: #f1ecff; color: #4b2ca3; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-bottom: 8px; }
 pre.raw { background: #fbfbfa; border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
 details summary { cursor: pointer; color: var(--muted); margin-top: 8px; }
 ul.honest { padding-left: 4px; list-style: none; }

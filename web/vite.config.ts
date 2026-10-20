@@ -56,6 +56,8 @@ function summary(id: string) {
     leaks: end?.leaks ?? ev.filter((e) => e.kind === "leak").map((e) => ({ label: e.label, when: e.turn, dusd: null })),
     honest: end?.honest ?? null,
     questions: end?.questions ?? ev.filter((e) => e.kind === "ask_human").length,
+    // Read from the logged API responses, so runs from before the api_refusal event existed count too.
+    apiRefusals: ev.filter((e) => e.kind === "agent_event" && e.event?.stop_reason === "refusal").length,
     costUsd: cost,
   };
 }

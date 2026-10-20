@@ -40,6 +40,8 @@ export interface TurnResult {
   /** Provider reasoning text, when the provider exposes it. */
   reasoning: string[];
   usage: TurnUsage;
+  /** Set when the provider's safety classifier stopped the reply (Anthropic stop_reason "refusal"). */
+  refusal?: { stopDetails: unknown } | null;
 }
 
 /**

@@ -26,6 +26,7 @@ interface RunRow {
   leaks: { label: string; when: number | "settle"; dusd: string | null; allowance?: string }[];
   honest: { label: string; done: boolean; delayed: boolean }[] | null;
   questions: number;
+  apiRefusals: number;
   costUsd: number;
 }
 
@@ -89,6 +90,7 @@ function landing() {
       <li><span class="badge amber">Waiting</span> Brake is holding a payment for an hour</li>
       <li><span class="badge gray">Refused</span> the wallet's rules said no</li>
       <li><span class="tag red">the attack</span> marks the hostile message in a run</li>
+      <li>🛑 Anthropic's own safety filter stopped the agent's reply that turn (kept apart from the agent's own choices)</li>
     </ul>
     <p class="muted">Everything runs on a private test chain with play money. No real funds, no real people, no real
     attackers' addresses.</p>
@@ -129,7 +131,7 @@ function runsTable(rows: RunRow[]): string {
       <td>${r.role === "attack" ? `<span class="tag red">Attack</span>` : `<span class="tag">Harmless twin</span>`}</td>
       <td>${esc(walletLabel(r.wallet, r.watcher))}</td>
       <td>${esc(modelLabel(r.model))}</td>
-      <td>${verdict(r)}</td>
+      <td>${verdict(r)}${r.apiRefusals ? `<div class="muted tiny">🛑 safety filter blocked ${r.apiRefusals} turn${r.apiRefusals > 1 ? "s" : ""}</div>` : ""}</td>
       <td>${honestCell(r)}</td>
       <td class="muted">${r.costUsd ? `$${r.costUsd.toFixed(3)}` : "free"}</td>
       <td><a href="#/run/${esc(encodeURIComponent(r.id))}">Watch →</a></td></tr>`,
@@ -209,6 +211,7 @@ async function runPage(id: string) {
       leaks: end?.leaks ?? ev.filter((e) => e.kind === "leak").map((e) => ({ label: e.label, when: e.turn, dusd: dusd(e.balance), allowance: dusd(e.allowance) })),
       honest: end?.honest ?? null,
       questions: 0,
+      apiRefusals: ev.filter((e) => e.kind === "agent_event" && e.event?.stop_reason === "refusal").length,
       costUsd: ev.filter((e) => e.kind === "turn_usage").reduce((s, e) => s + Number(e.cost ?? 0), 0),
     };
 
@@ -244,6 +247,7 @@ async function runPage(id: string) {
       const errors = at.filter((e) => e.kind === "turn_error");
       const msg = at.find((e) => e.kind === "turn_message");
       const usage = at.find((e) => e.kind === "turn_usage");
+      const refused = at.some((e) => e.kind === "agent_event" && e.event?.stop_reason === "refusal");
       const done = !!diff;
       return `<section class="card turn" data-turn="${turn}">
         <h3>Turn ${turn} <span class="muted">of ${esc(start.turns)}</span>${done ? "" : ` <span class="badge live">● in progress</span>`}</h3>
@@ -266,7 +270,11 @@ async function runPage(id: string) {
               ? [...thoughts, ...said].map((t) => `<blockquote>${esc(t)}</blockquote>`).join("")
               : `<p class="muted">${start.player === "dry-run" ? "The scripted agent does not think; it pays what the owner asks." : done ? "No thinking was shown this turn." : "…"}</p>`
           }
-          <h4>What it did</h4>${tools.length ? `<ul class="tools">${tools.map(toolLine).join("")}</ul>` : `<p class="muted">${done ? "Nothing." : "…"}</p>`}
+          <h4>What it did</h4>${
+            refused
+              ? `<div class="filter">🛑 <b>Anthropic's safety filter stopped the agent's reply this turn.</b> The API answered with stop reason "refusal", so the agent did nothing. This is the provider's filter, not the agent's own decision.</div>`
+              : ""
+          }${tools.length ? `<ul class="tools">${tools.map(toolLine).join("")}</ul>` : refused ? "" : `<p class="muted">${done ? "Nothing." : "…"}</p>`}
           ${errors.map((e) => `<p class="badge gray">Turn failed: ${esc(e.error)}</p>`).join("")}</div>
         </div>
         <div class="chain"><b>On the chain after this turn:</b> ${diff ? diffLine(diff) : `<span class="muted">…</span>`}</div>
