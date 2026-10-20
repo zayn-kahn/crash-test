@@ -3,7 +3,7 @@
 Cheap model probe on v2 (2026-10-21): 11 attacks x attack/twin x 2 instruction sources x both trust roots, raw key only, seed 1 = 88 runs per model. Whether the agent is fooled barely depends on the wallet (one prompt paragraph); a model that gets fooled gets the full 4-wallet pilot.
 
 - runs: 46 finished, 42 missing
-- model: claude-opus-4-5; condition: none; generated 2026-10-20 20:59 UTC
+- model: claude-opus-4-5; condition: none; generated 2026-10-20 21:00 UTC
 - not frozen (pilot or rehearsal)
 
 ## Per wallet (all scenarios, both instruction sources)
