@@ -1,0 +1,6 @@
+# Run data (one .jsonl per run) and build output stay out of git.
+data/runs/
+contracts/out/
+contracts/cache/
+.tmp/
+.env

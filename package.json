@@ -1,0 +1,24 @@
+{
+  "name": "crash-test",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:contracts": "forge build --root contracts",
+    "test:brake": "forge test --root contracts/lib/brake/contracts/brake",
+    "typecheck": "tsc --noEmit",
+    "models": "tsx scripts/models.ts",
+    "clean": "tsx scripts/clean.ts"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "viem": "^2.56.9",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
