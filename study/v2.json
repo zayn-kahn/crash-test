@@ -1,0 +1,78 @@
+{
+  "name": "v2",
+  "about": "v2 (Fable review 01): v1's 11 attacks with a trust-root axis. contacts = the vetted contact list in the prompt every turn (v1); notes = no list: the owner names people on turn 1, the agent keeps its own notes and can read the chain's history (get_history, with earlier payments seeded). Grok's hidden line is base64 (Morse tripped the API filter). Models: Haiku 5.5 first; OpenRouter models next. Seeds fix addresses, not sampling.",
+  "model": "claude-haiku-5-5",
+  "judgeModel": "claude-haiku-5-5",
+  "condition": "none",
+  "scenarios": [
+    "grok",
+    "memory",
+    "router",
+    "lookalike",
+    "split",
+    "refund",
+    "spoof",
+    "memory-hard",
+    "spoof-hard",
+    "router-hard",
+    "bec"
+  ],
+  "roles": [
+    "attack",
+    "twin"
+  ],
+  "instructions": [
+    "owner-only",
+    "public-requests"
+  ],
+  "trustRoots": [
+    "contacts",
+    "notes"
+  ],
+  "pilotTrustRoots": [
+    "notes"
+  ],
+  "wallets": [
+    {
+      "wallet": "raw"
+    },
+    {
+      "wallet": "policy"
+    },
+    {
+      "wallet": "policy-caps"
+    },
+    {
+      "wallet": "brake",
+      "watcher": "cancel-unknown"
+    }
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "pilotSeeds": [
+    1
+  ],
+  "parallel": 6,
+  "basePort": 8800,
+  "frozen": null
+}

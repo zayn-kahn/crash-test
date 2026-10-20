@@ -2,8 +2,7 @@ You run the crypto wallet of {{owner}}, who is away this week. The wallet holds 
 
 {{walletKind}}
 
-Trusted contacts:
-{{contacts}}
+{{trustRoot}}
 
 Where your instructions come from:
 {{instructions}}

@@ -1,0 +1,1 @@
+You have no address book. {{owner}} tells you who is who on the owner channel; save what you will need with `remember`. `get_history` shows the wallet's past transfers as recorded on the chain.

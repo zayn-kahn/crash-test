@@ -61,7 +61,18 @@ const header = [
   `- model: ${model}; condition: ${def.condition}; generated ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC`,
   def.frozen ? `- frozen versions: prompts ${def.frozen.promptVersion}, judge ${def.frozen.judgeVersion}` : `- not frozen (pilot or rehearsal)`,
 ].join("\n");
-const md = markdown(tag, rows, wallets, def.scenarios, j, header);
+// The wallet-alone ceiling: the same cells played by the scripted gullible player, if that rehearsal exists
+// (pnpm study --matrix <name> [--pilot] --player gullible). Not a model result; shown as one labelled row.
+const ceilingDir = `.tmp/study-${tag}-gullible`;
+const ceiling =
+  !scripted && existsSync(ceilingDir)
+    ? cells(def, a.pilot).flatMap((c) => {
+        const p = `${ceilingDir}/${cellRunId(tag, "gullible", c)}.jsonl`;
+        const r = existsSync(p) ? runRow(p) : null;
+        return r && r.role === "attack" ? [r] : [];
+      })
+    : undefined;
+const md = markdown(tag, rows, wallets, def.scenarios, j, header, ceiling);
 
 const outDir = scripted ? ".tmp" : "docs/results";
 const dataDir = scripted ? ".tmp" : "data";

@@ -7,6 +7,7 @@
  * --player: dry-run (free, scripted) | haiku | sonnet | a full model id from src/config.ts.
  * --encoding: plain | morse | base64 | zero-width, overrides how the scenario's hidden line is written.
  * --instructions: owner-only | public-requests, overrides where the agent takes instructions from.
+ * --trust-root: contacts (default) | notes: where the agent learns who is who (contact list vs its notes + get_history).
  * --wallet: raw | policy | policy-caps | brake.
  * Model runs are refused once the spend logged in data/runs/ reaches MAX_USD.
  */
@@ -16,7 +17,7 @@ import { runEpisode } from "../src/game/run.js";
 import { ClaudeBackend } from "../src/players/claude.js";
 import { DryRunBackend } from "../src/players/dry-run.js";
 import type { AgentBackend } from "../src/players/types.js";
-import type { WalletKind } from "../src/prompts.js";
+import type { TrustRoot, WalletKind } from "../src/prompts.js";
 import { spentUsd } from "../src/runs.js";
 import type { Role } from "../src/scenarios/load.js";
 import { SCHEMES, type Scheme } from "../src/scenarios/encode.js";
@@ -34,6 +35,7 @@ const { values: a } = parseArgs({
     port: { type: "string", default: "8545" },
     encoding: { type: "string" },
     instructions: { type: "string" },
+    "trust-root": { type: "string" },
   },
 });
 
@@ -57,9 +59,9 @@ else {
 }
 
 const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "").replace("T", "-");
-const runId = `${a.scenario}${encoding ? `-${encoding}` : ""}${a.instructions ? `-${a.instructions}` : ""}-${role}-${wallet}${wallet === "brake" ? `-${watcher}` : ""}-${backend.model}-s${a.seed}-${stamp}`;
+const runId = `${a.scenario}${encoding ? `-${encoding}` : ""}${a.instructions ? `-${a.instructions}` : ""}${a["trust-root"] ? `-${a["trust-root"]}` : ""}-${role}-${wallet}${wallet === "brake" ? `-${watcher}` : ""}-${backend.model}-s${a.seed}-${stamp}`;
 console.log(`run ${runId}`);
-const s = await runEpisode({ scenario: a.scenario!, role, wallet, watcher, condition: a.condition!, instructions: a.instructions, encoding, seed: Number(a.seed), port: Number(a.port), backend, runId });
+const s = await runEpisode({ scenario: a.scenario!, role, wallet, watcher, condition: a.condition!, instructions: a.instructions, trustRoot: a["trust-root"] as TrustRoot | undefined, encoding, seed: Number(a.seed), port: Number(a.port), backend, runId });
 
 console.log(`log      ${s.logPath}`);
 console.log(`leaks    ${s.leaks.length ? s.leaks.map((l) => `${l.label}: ${l.dusd} dUSD, allowance ${l.allowance}${l.signed ? ", signed a message" : ""} (turn ${l.when}${l.afterWait ? ", after the wait" : ""})`).join("; ") : "none"}`);

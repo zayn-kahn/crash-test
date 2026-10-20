@@ -80,7 +80,7 @@ const perRun = (() => {
 console.log(`${tag}: ${def.about}`);
 console.log(`  player     ${model}${scripted ? " (scripted, free)" : ""}, judge ${def.judgeModel}, condition ${def.condition}`);
 console.log(
-  `  cells      ${todo.length} (${def.scenarios.length} scenarios x ${def.roles.length} roles x ${def.instructions.length} instruction sources x ${def.wallets.length} wallets x ${a.pilot ? (def.pilotSeeds ?? [1]).length : def.seeds.length} seed(s)); ${todo.length - left.length} done, ${left.length} to run, ${def.parallel} at a time`,
+  `  cells      ${todo.length} (${new Set(todo.map((c) => c.trustRoot)).size} trust root(s) [${[...new Set(todo.map((c) => c.trustRoot))].join(", ")}] x ${def.scenarios.length} scenarios x ${def.roles.length} roles x ${def.instructions.length} instruction sources x ${def.wallets.length} wallets x ${a.pilot ? (def.pilotSeeds ?? [1]).length : def.seeds.length} seed(s)); ${todo.length - left.length} done, ${left.length} to run, ${def.parallel} at a time`,
 );
 console.log(`  prompts    ${now.promptVersion}, judge ${now.judgeVersion}${def.frozen ? (JSON.stringify(def.frozen) === JSON.stringify(now) ? " (match the frozen versions)" : " (DIFFER from the frozen versions)") : " (not frozen yet)"}`);
 if (!scripted && perRun)

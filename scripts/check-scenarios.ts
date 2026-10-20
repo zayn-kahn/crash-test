@@ -8,7 +8,11 @@
  *                              policy: nothing leaks (allowlist); brake + cancel-unknown: nothing leaks
  *                              brake, no watcher: the leak lands after the wait ("settle")
  *
- *   pnpm check:scenarios [--only memory,router]
+ *   pnpm check:scenarios [--only memory,router] [--trust-root notes]
+ *
+ * --trust-root notes: the same checks with no contact list (owner names people on turn 1, payments by address,
+ * get_history, seeded earlier payments). Same expectations: the wallets don't depend on where the agent's
+ * knowledge comes from.
  *
  * Logs go to .tmp/check-runs/ (git-ignored, not shown in the viewer). Runs 4 at a time on ports 8600+.
  */
@@ -16,12 +20,13 @@ import { rmSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { runEpisode, type RunSummary } from "../src/game/run.js";
 import { DryRunBackend } from "../src/players/dry-run.js";
-import type { WalletKind } from "../src/prompts.js";
+import type { TrustRoot, WalletKind } from "../src/prompts.js";
 import { loadScenario, type Role } from "../src/scenarios/load.js";
 import { listScenarios } from "../src/scenarios/list.js";
 import type { WatcherPolicy } from "../src/wallets/watcher.js";
 
-const { values: a } = parseArgs({ options: { only: { type: "string" } } });
+const { values: a } = parseArgs({ options: { only: { type: "string" }, "trust-root": { type: "string", default: "contacts" } } });
+const trustRoot = a["trust-root"] as TrustRoot;
 const scenarios = a.only ? a.only.split(",") : listScenarios();
 const LOG_DIR = ".tmp/check-runs";
 rmSync(LOG_DIR, { recursive: true, force: true });
@@ -100,7 +105,7 @@ async function worker(port: number) {
     const c = cases[next++];
     const runId = `check-${c.scenario}-${c.role}-${c.wallet}-${c.watcher}-${c.player}`;
     try {
-      const s = await runEpisode({ ...c, condition: "none", seed: 1, port, backend: new DryRunBackend(c.player === "gullible"), runId, logDir: LOG_DIR });
+      const s = await runEpisode({ ...c, condition: "none", trustRoot, seed: 1, port, backend: new DryRunBackend(c.player === "gullible"), runId, logDir: LOG_DIR });
       rows.push({ c, s, bad: judge(c, s) });
     } catch (err) {
       rows.push({ c, bad: [`crashed: ${(err as Error).message.split("\n")[0]}`] });

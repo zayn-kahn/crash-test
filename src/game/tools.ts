@@ -2,12 +2,13 @@
  * The agent's tools (descriptions in prompts/agent/tools.md). Money tools turn into Proposals that the
  * wallet under test decides on; the result text is what the agent reads back.
  */
-import { encodeFunctionData, formatUnits, getAddress, type Abi, type AbiFunction, type Address, type PublicClient, type WalletClient } from "viem";
+import { encodeFunctionData, formatUnits, getAddress, parseAbiItem, type Abi, type AbiFunction, type Address, type PublicClient, type WalletClient } from "viem";
 import { z } from "zod";
 import { DUSD_DECIMALS } from "../config.js";
 import { dusd, dusdArtifact } from "../chain/deploy.js";
 import type { JsonlLogger } from "../log.js";
 import { defineTool, type ToolDef } from "../players/types.js";
+import type { TrustRoot } from "../prompts.js";
 import type { Scenario } from "../scenarios/load.js";
 import { toolResult } from "../scenarios/load.js";
 import type { Outcome, Proposal, WalletAdapter } from "../wallets/types.js";
@@ -26,6 +27,8 @@ export interface ToolContext {
   descriptions: Record<string, string>;
   /** Scenario contracts the agent may call (Phase 2): lower-case address -> ABI. */
   contracts: Record<string, Abi>;
+  /** notes: no contact list anywhere (no get_contacts, no paying by name, bare addresses), get_history instead. */
+  trustRoot: TrustRoot;
 }
 
 const fmt = (units: bigint) => formatUnits(units, DUSD_DECIMALS);
@@ -36,7 +39,8 @@ export function resolveTarget(s: Scenario, target: string): { address: Address }
   const byName = Object.entries(s.contacts).find(([n]) => n.toLowerCase() === t.toLowerCase());
   if (byName) return { address: byName[1] };
   if (/^0x[0-9a-f]{40}$/i.test(t)) return { address: getAddress(`0x${t.slice(2).toLowerCase()}`) };
-  return { error: `Unknown recipient "${target}": use a contact name or a 0x address.` };
+  const named = Object.keys(s.contacts).length > 0;
+  return { error: `Unknown recipient "${target}": use ${named ? "a contact name or " : ""}a 0x address.` };
 }
 
 /** Whole or decimal dUSD as a string or number -> base units, or an error text. */
@@ -105,7 +109,9 @@ function withIntercepts(ctx: ToolContext, tools: ToolDef[]): ToolDef[] {
 }
 
 function builtInTools(ctx: ToolContext): ToolDef[] {
-  const { scenario: s, world, wallet, turn, logger } = ctx;
+  const { world, wallet, turn, logger } = ctx;
+  // Under the notes trust root the tools know no names: every address is shown bare and must be given in full.
+  const s: Scenario = ctx.trustRoot === "notes" ? { ...ctx.scenario, contacts: {} } : ctx.scenario;
   const d = (name: string) => {
     const text = ctx.descriptions[name];
     if (!text) throw new Error(`no description for tool ${name} in prompts/agent/tools.md`);
@@ -124,6 +130,37 @@ function builtInTools(ctx: ToolContext): ToolDef[] {
     return line.charAt(0).toUpperCase() + line.slice(1) + ".";
   };
 
+  const getContacts = defineTool({
+    name: "get_contacts",
+    description: d("get_contacts"),
+    parameters: z.object({}),
+    handler: async () => Object.entries(s.contacts).map(([n, a]) => `- ${n}: ${a}`).join("\n"),
+  });
+  const getHistory = defineTool({
+    name: "get_history",
+    description: d("get_history"),
+    parameters: z.object({}),
+    handler: async () => {
+      const me = wallet.address().toLowerCase();
+      const logs = await ctx.pub.getLogs({
+        address: ctx.token,
+        event: parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)"),
+        fromBlock: 0n,
+      });
+      const mine = logs.filter((l) => l.args.from?.toLowerCase() === me || l.args.to?.toLowerCase() === me);
+      if (!mine.length) return "No transfers yet.";
+      const lines: string[] = [];
+      for (const l of mine) {
+        const block = await ctx.pub.getBlock({ blockNumber: l.blockNumber! });
+        const day = new Date(Number(block.timestamp) * 1000).toISOString().slice(0, 10);
+        const out = l.args.from?.toLowerCase() === me;
+        const other = (out ? l.args.to : l.args.from) as Address;
+        const minted = other === "0x0000000000000000000000000000000000000000";
+        lines.push(`${day}  ${out ? "sent" : "received"} ${fmt(l.args.value!)} dUSD ${out ? "to" : "from"} ${minted ? "(new dUSD issued)" : other}`);
+      }
+      return lines.join("\n");
+    },
+  });
   return [
     defineTool({
       name: "get_balance",
@@ -134,12 +171,7 @@ function builtInTools(ctx: ToolContext): ToolDef[] {
         return `${fmt(await balance())} dUSD.${waiting ? `\nWaiting to run:\n${waiting}` : ""}`;
       },
     }),
-    defineTool({
-      name: "get_contacts",
-      description: d("get_contacts"),
-      parameters: z.object({}),
-      handler: async () => Object.entries(s.contacts).map(([n, a]) => `- ${n}: ${a}`).join("\n"),
-    }),
+    ctx.trustRoot === "notes" ? getHistory : getContacts,
     defineTool({
       name: "read_inbox",
       description: d("read_inbox"),

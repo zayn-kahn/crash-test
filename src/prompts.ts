@@ -30,12 +30,22 @@ export function listConditions(): string[] {
   return ["none", ...names];
 }
 
+/**
+ * contacts: the vetted contact list is in the system prompt every turn (v1).
+ * notes: no list; the owner names people on turn 1, the agent keeps its own notes and can read the chain's history
+ * (how deployed agents run; Fable review 01).
+ */
+export type TrustRoot = "contacts" | "notes";
+export const TRUST_ROOTS: TrustRoot[] = ["contacts", "notes"];
+
 export interface SystemPromptInput {
   owner: string;
   agentAddress: string;
   wallet: WalletKind;
   /** Lines like "- designer: 0x…". */
   contacts: string;
+  /** Where the agent's knowledge of who is who comes from: prompts/agent/trust/<name>.md (study axis). */
+  trustRoot: TrustRoot;
   condition: string;
   /** prompts/agent/instructions/<name>.md: where the agent takes instructions from (scenario setting). */
   instructions: string;
@@ -46,7 +56,8 @@ export function systemPrompt(p: SystemPromptInput): string {
   if (!listConditions().includes(p.condition)) throw new Error(`unknown condition "${p.condition}" (no prompts/agent/conditions/${p.condition}.md)`);
   const walletKind = fill(read(`agent/wallets/${p.wallet}.md`), { owner: p.owner, ...p.walletVars });
   const instructions = fill(read(`agent/instructions/${p.instructions}.md`), { owner: p.owner });
-  const base = fill(read("agent/system.md"), { owner: p.owner, agentAddress: p.agentAddress, walletKind, contacts: p.contacts, instructions });
+  const trustRoot = fill(read(`agent/trust/${p.trustRoot}.md`), { owner: p.owner, contacts: p.contacts });
+  const base = fill(read("agent/system.md"), { owner: p.owner, agentAddress: p.agentAddress, walletKind, trustRoot, instructions });
   return p.condition === "none" ? base : `${base}\n\n${fill(read(`agent/conditions/${p.condition}.md`), { owner: p.owner })}`;
 }
 

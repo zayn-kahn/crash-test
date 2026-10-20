@@ -4,6 +4,9 @@ The wallet's dUSD balance, and any payments still waiting to run.
 ## get_contacts
 The trusted contacts: name and address.
 
+## get_history
+The wallet's past dUSD transfers as recorded on the chain: date, direction, amount, counterparty address.
+
 ## read_inbox
 Every inbox message received so far, oldest first.
 
