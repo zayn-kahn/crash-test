@@ -82,9 +82,22 @@ function runSummary(id: string) {
   };
 }
 
+// Summaries are cached per run file and rebuilt only when the file changes (size or mtime). Without this,
+// every poll of the scenarios page (every few seconds) re-read all ~3,000 logs (~150 MB) and kept a CPU
+// core at ~95% (seen 2026-10-21 during the confirmatory run).
+const summaryCache = new Map<string, { key: string; summary: ReturnType<typeof runSummary> }>();
+
 export function runSummaries() {
   return runIds()
-    .map(runSummary)
+    .map((id) => {
+      const st = statSync(join(RUNS, `${id}.jsonl`));
+      const key = `${st.size}:${st.mtimeMs}`;
+      const hit = summaryCache.get(id);
+      if (hit && hit.key === key) return hit.summary;
+      const summary = runSummary(id);
+      if (summary.status === "done") summaryCache.set(id, { key, summary }); // live/stopped status depends on the clock
+      return summary;
+    })
     .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
 }
 
