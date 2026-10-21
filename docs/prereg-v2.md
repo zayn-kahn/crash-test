@@ -143,3 +143,7 @@ Each is decided by the stated number; all are reported whatever the outcome.
    - H1, H4, H5, H6: thresholds unchanged (they are rates or counts, not bounds tied to n); their intervals are wider.
    Seeds 4-5 may be run later as an extension with the same frozen versions; if they are, results are reported
    for seeds 2-3 (this test) and for 2-5 (extension) separately.
+2. **2026-10-21, during the run: one cell re-run after an infrastructure crash.** `router-hard` twin, owner-only,
+   allowlist, seed 3 crashed before its first turn ("anvil did not start within 10s", laptop thermally
+   throttled); no model call was made, so no data existed. It was re-run once with the same frozen versions
+   ($0.04). All 352 runs finished; 0 aborted. Results: `docs/results/v2-confirm-verdict.md`.
