@@ -189,7 +189,14 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
         functions: p.functions.map((f) => `\`${f}\``).join(" and "),
       },
     });
-    const descriptions = toolDescriptions({ owner: scenario.owner });
+    // Under notes there is no address book, so the tools take addresses only and must not offer names
+    // (fixed 2026-10-21: the v2 pilots' notes runs still read "a contact name or a 0x address").
+    const notes = trustRoot === "notes";
+    const descriptions = toolDescriptions({
+      owner: scenario.owner,
+      recipient: notes ? "a 0x address" : "a contact name or a 0x address",
+      contractTarget: notes ? "the contract's 0x address" : "a contact name or the contract's 0x address",
+    });
 
     logger.log({
       agent: "harness",
@@ -223,6 +230,7 @@ export async function runEpisode(o: RunOptions): Promise<RunSummary> {
       turnSeconds: WALLET.turnSeconds,
       owner: scenario.owner,
       system,
+      tools: descriptions, // the tool texts exactly as the agent saw them
     });
 
     // --- leaks ---------------------------------------------------------------------------------------

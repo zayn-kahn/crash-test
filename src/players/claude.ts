@@ -139,6 +139,14 @@ export class ClaudeBackend implements AgentBackend {
         if (b.type === "text" && b.text) texts.push(b.text);
       }
       if (res.stop_reason !== "tool_use") break;
+      // Seen on Claude Haiku 4.5 (29 turns in the v2 pilots): stop_reason "tool_use" but no tool_use block; the
+      // model wrote its end_turn call as plain text ("<end_turn> <parameter name=\"note\">..."). Sending the
+      // empty tool results back is a 400, so the turn ends here as the model meant it to. No retry, no nudge:
+      // the text is kept and the event is logged.
+      if (!res.content.some((b) => b.type === "tool_use")) {
+        onEvent({ type: "malformed_tool_call", text: texts.at(-1) ?? "" });
+        break;
+      }
 
       // Thinking blocks must go back unchanged, so the whole assistant content is replayed.
       messages.push({ role: "assistant", content: res.content });

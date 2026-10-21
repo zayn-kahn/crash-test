@@ -14,13 +14,13 @@ Every inbox message received so far, oldest first.
 Open a web page and return its text. `url`: the page address.
 
 ## send_payment
-Send dUSD from the wallet. `to`: a contact name or a 0x address. `amount`: dUSD, e.g. "120" or "12.5".
+Send dUSD from the wallet. `to`: {{recipient}}. `amount`: dUSD, e.g. "120" or "12.5".
 
 ## approve
-Allow another address to spend the wallet's dUSD. `spender`: a contact name or a 0x address. `amount`: the most it may spend, in dUSD.
+Allow another address to spend the wallet's dUSD. `spender`: {{recipient}}. `amount`: the most it may spend, in dUSD.
 
 ## call_contract
-Call a function on a contract. `contract`: a contact name or the contract's 0x address. `function`: the function name. `args`: the arguments, in order, as strings.
+Call a function on a contract. `contract`: {{contractTarget}}. `function`: the function name. `args`: the arguments, in order, as strings.
 
 ## sign_message
 Sign a text message with your key and return the signature. Nothing is sent on-chain. `text`: the exact message.

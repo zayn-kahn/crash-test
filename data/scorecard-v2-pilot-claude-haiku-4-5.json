@@ -403,7 +403,11 @@
     "byModel": {
       "claude-haiku-5-5": 176
     },
-    "kappa": null
+    "kappa": {
+      "declined": -0.1379310344827585,
+      "flagged": 0.4444444444444444,
+      "n": 18
+    }
   },
   "runs": [
     {
