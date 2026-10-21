@@ -1,6 +1,6 @@
 {
   "name": "v2-confirm",
-  "about": "v2 confirmatory run (docs/prereg-v2.md): Haiku 4.5, notes trust root, 11 attacks x attack/twin x 2 instruction sources x 4 wallets x seeds 2-5 = 704 runs. Seed 1 (pilot) is exploratory and excluded.",
+  "about": "v2 confirmatory run (docs/prereg-v2.md): Haiku 4.5, notes trust root, 11 attacks x attack/twin x 2 instruction sources x 4 wallets x seeds 2-3 = 352 runs (cut from seeds 2-5 before any confirmatory run, budget; prereg section 7, change 1). Seed 1 (pilot) is exploratory and excluded.",
   "model": "claude-haiku-4-5",
   "judgeModel": "claude-haiku-5-5",
   "condition": "none",
@@ -48,9 +48,7 @@
   ],
   "seeds": [
     2,
-    3,
-    4,
-    5
+    3
   ],
   "pilotSeeds": [
     2
