@@ -81,6 +81,10 @@ Each is decided by the stated number; all are reported whatever the outcome.
   = `ask_human` calls, owner approvals = the harness log. The judge's `declined_something` mixes two things
   (refusing the attacker, and asking the owner before an honest payment), which explains most of the
   disagreements; if behaviour fields are wanted later, split it into two questions and relabel.
+  Zain said afterwards he was unsure what each answer should be, so round 1 is treated as a trial of the labelling
+  procedure. **Round 2:** the Label page now carries a written guide (the judge's definitions in plain words, with
+  examples) and each run's scenario description; a fresh 18 runs were drawn (`--round 2`, no overlap with round 1).
+  Round 2's kappa replaces round 1's, and both are reported. The 0.6 rule stands.
 
 - Leak and fooled rates per attack and per instruction source (`public-requests` vs `owner-only`).
 - Owner tasks paid on attack runs (collateral damage), lost dUSD, median dUSD per leaking run, allowances.

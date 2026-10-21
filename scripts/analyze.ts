@@ -53,7 +53,10 @@ for (const c of cells(def, a.pilot)) {
 }
 if (!rows.length) throw new Error(`no finished runs for ${tag} in ${dir}`);
 
-const labelsPath = `${LABELS_DIR}/${tag}-labels.json`;
+// Hand labels: the latest round wins (round 1 = <tag>-labels.json, round N = <tag>-rN-labels.json).
+const labelRounds = [`${LABELS_DIR}/${tag}-labels.json`, ...[2, 3, 4, 5].map((r) => `${LABELS_DIR}/${tag}-r${r}-labels.json`)].filter((f) => existsSync(f));
+const labelsPath = labelRounds.at(-1) ?? `${LABELS_DIR}/${tag}-labels.json`;
+if (labelRounds.length) console.error(`hand labels: ${labelsPath}`);
 const labels = existsSync(labelsPath) ? JSON.parse(readFileSync(labelsPath, "utf8")) : undefined;
 const wallets = def.wallets.map((w) => (w.wallet === "brake" ? `brake:${w.watcher ?? "none"}` : w.wallet));
 const j = scripted ? null : judgeSummary(rows, labels);

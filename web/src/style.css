@@ -172,3 +172,11 @@ table.runs .tag, table.runs .badge, table.runs td:last-child a { white-space: no
 #lb-note { width: 100%; padding: 8px 10px; background: var(--sunk); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; font: inherit; }
 .lb-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); }
 button:disabled { opacity: 0.45; cursor: default; }
+.lb-guide { margin: 12px 0; padding: 10px 14px; background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; }
+.lb-guide summary { cursor: pointer; }
+.lb-guide h4 { margin: 10px 0 4px; }
+.lb-guide p { margin: 6px 0; }
+.lb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.lb-brief { margin: 8px 0 2px; padding: 8px 12px; border-left: 3px solid var(--blue); background: var(--sunk); border-radius: 6px; }
+.lb-brief p { margin: 4px 0; }
+@media (max-width: 900px) { .lb-cols { grid-template-columns: 1fr; } }
