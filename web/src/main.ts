@@ -51,6 +51,7 @@ function route() {
   window.scrollTo(0, 0);
   const h = location.hash || "#/";
   app.classList.toggle("wide", h.startsWith("#/scenarios")); // the runs table gets more room, still centred
+  app.classList.toggle("split", /^#\/label\/[^/]+/.test(h)); // labelling: questions left (fixed), run right (scrolls)
   if (h.startsWith("#/run/")) void runPage(decodeURIComponent(h.slice(6)));
   else if (h.startsWith("#/label")) void labelPage(h);
   else if (h.startsWith("#/scenarios")) void scenariosPage();
@@ -577,7 +578,7 @@ const QUESTIONS: [keyof Label, string, string][] = [
 
 /** The labelling guide: the judge's own definitions, in plain words, with examples. */
 const LABEL_GUIDE = `
-<details class="lb-guide" open><summary><b>How to decide (read once, then collapse)</b></summary>
+<details class="lb-guide" __OPEN__><summary><b>How to decide (read once, then collapse)</b></summary>
 <div class="lb-cols">
 <div>
 <h4>1. Called something out as suspicious?</h4>
@@ -654,6 +655,7 @@ async function labelPage(h: string) {
   };
 
   app.innerHTML = `
+    <div class="lb-layout"><aside class="lb-left">
     <section class="card lb-panel">
       <div class="lb-top">
         <a href="#/label">← Samples</a>
@@ -661,7 +663,6 @@ async function labelPage(h: string) {
         <span class="lb-nav"><button class="ghost" id="lb-prev" ${n === 1 ? "disabled" : ""}>← Prev</button>
         <button class="ghost" id="lb-next" ${n === set.runs.length ? "disabled" : ""}>Next →</button></span>
       </div>
-      ${LABEL_GUIDE}
       <div class="lb-dots">${set.runs.map((r, i) => `<a href="#/label/${esc(tag)}/${i + 1}" class="lb-dot ${isDone(set.labels[r]) ? "done" : ""} ${i + 1 === n ? "here" : ""}" title="run ${i + 1}"></a>`).join("")}</div>
       <div class="lb-brief">${(() => {
         const m = id.match(/^v\d+(?:-probe)?-pilot-(.+?)-(attack|twin)-/);
@@ -678,9 +679,10 @@ async function labelPage(h: string) {
       <div class="lb-q"><input id="lb-note" placeholder="Note (optional): anything odd about this run" value="${esc(label.note)}"></div>
       <div class="lb-foot"><span id="lb-saved" class="muted small">${isDone(label) ? "✓ saved" : "Answer both; it saves on click."}</span>
         <button id="lb-go" ${isDone(label) ? "" : "disabled"}>Save &amp; next unlabelled →</button></div>
+      ${LABEL_GUIDE.replace("__OPEN__", doneCount() === 0 ? "open" : "")}
     </section>
-    <div id="lb-run"></div>
-    <button class="lb-up" id="lb-up">↑ Answer</button>`;
+    </aside>
+    <div class="lb-right" id="lb-run"></div></div>`;
 
   const save = async () => {
     const r = await fetch(`data/labels/${encodeURIComponent(tag)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ runId: id, ...label }) });
@@ -707,7 +709,6 @@ async function labelPage(h: string) {
     label.note = note.value;
     void save();
   });
-  document.getElementById("lb-up")?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   document.getElementById("lb-prev")?.addEventListener("click", () => go(n - 1));
   document.getElementById("lb-next")?.addEventListener("click", () => go(n + 1));
   document.getElementById("lb-go")?.addEventListener("click", async () => {

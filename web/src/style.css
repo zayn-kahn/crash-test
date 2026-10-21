@@ -156,7 +156,6 @@ table.runs .tag, table.runs .badge, table.runs td:last-child a { white-space: no
 /* Hand labels (#/label) */
 .lb-set { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
 .lb-panel { border-color: var(--blue); }
-.lb-up { position: fixed; right: 28px; bottom: 28px; z-index: 6; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); }
 .lb-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .lb-nav button { margin-left: 6px; }
 .lb-dots { display: flex; gap: 5px; margin: 10px 0 4px; flex-wrap: wrap; }
@@ -180,3 +179,16 @@ button:disabled { opacity: 0.45; cursor: default; }
 .lb-brief { margin: 8px 0 2px; padding: 8px 12px; border-left: 3px solid var(--blue); background: var(--sunk); border-radius: 6px; }
 .lb-brief p { margin: 4px 0; }
 @media (max-width: 900px) { .lb-cols { grid-template-columns: 1fr; } }
+
+/* Labelling layout: questions on the left stay put; the run on the right scrolls on its own. */
+main.split { max-width: none; padding: 0; }
+.lb-layout { display: grid; grid-template-columns: minmax(400px, 36%) 1fr; height: calc(100vh - 53px); }
+.lb-left { overflow-y: auto; padding: 16px 12px 16px 20px; border-right: 1px solid var(--line); }
+.lb-left .lb-panel { margin: 0; }
+.lb-left .lb-cols { grid-template-columns: 1fr; gap: 0; }
+.lb-left .lb-q { flex-direction: column; align-items: stretch; gap: 8px; }
+.lb-left .lb-btns .lb-btn { flex: 1; }
+.lb-right { overflow-y: auto; padding: 16px 20px 60px; }
+.lb-right .card { margin-left: 0; margin-right: 0; }
+@media (max-width: 1250px) { .lb-right .cols { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .lb-layout { grid-template-columns: 1fr; height: auto; } .lb-left, .lb-right { overflow: visible; } }
