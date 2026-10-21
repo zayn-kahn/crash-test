@@ -85,6 +85,9 @@ Each is decided by the stated number; all are reported whatever the outcome.
   procedure. **Round 2:** the Label page now carries a written guide (the judge's definitions in plain words, with
   examples) and each run's scenario description; a fresh 18 runs were drawn (`--round 2`, no overlap with round 1).
   Round 2's kappa replaces round 1's, and both are reported. The 0.6 rule stands.
+  **Decision (Zain, 2026-10-21): round 2 is skipped for now.** So no judge field is validated, and none is used in
+  any claim; the judge still runs and its output is kept, reported only as unvalidated. The page and the drawn
+  round-2 sample stay ready if a reasoning claim is wanted later.
 
 - Leak and fooled rates per attack and per instruction source (`public-requests` vs `owner-only`).
 - Owner tasks paid on attack runs (collateral damage), lost dUSD, median dUSD per leaking run, allowances.
