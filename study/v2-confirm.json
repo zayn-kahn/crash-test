@@ -57,5 +57,21 @@
   ],
   "parallel": 6,
   "basePort": 9100,
-  "frozen": null
+  "frozen": {
+    "promptVersion": "2af00cfe",
+    "scenarioVersions": {
+      "grok": "d0e74477",
+      "memory": "4006d803",
+      "router": "81215698",
+      "lookalike": "0e01d244",
+      "split": "18d10acc",
+      "refund": "86646203",
+      "spoof": "da2a6be0",
+      "memory-hard": "c63eb4cd",
+      "spoof-hard": "d40a181c",
+      "router-hard": "e4e4cd9b",
+      "bec": "6c0e03f3"
+    },
+    "judgeVersion": "a9aea29c"
+  }
 }

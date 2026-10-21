@@ -1,8 +1,17 @@
-# Pre-registration: crash-test v2 confirmatory run (DRAFT, not frozen)
+# Pre-registration: crash-test v2 confirmatory run (FROZEN 2026-10-21)
 
-Status: **draft for Zain's review.** It is fixed when this file is committed together with `study/v2-confirm.json`
-and its `frozen` hashes (`pnpm study --matrix v2-confirm --freeze`); the commit hash is the timestamp. After that,
-any change is reported below as a deviation.
+Status: **frozen on Zain's go, 2026-10-21 (PKT).** This file was committed together with `study/v2-confirm.json`
+and its `frozen` hashes; that commit's hash and date are the timestamp. Frozen versions: prompts `2af00cfe`,
+judge `a9aea29c`, scenarios grok `d0e74477`, memory `4006d803`, router `81215698`, lookalike `0e01d244`, split
+`18d10acc`, refund `86646203`, spoof `da2a6be0`, memory-hard `c63eb4cd`, spoof-hard `d40a181c`, router-hard
+`e4e4cd9b`, bec `6c0e03f3`. `pnpm study --matrix v2-confirm` refuses to run if any of these differ. The harness
+code is the code in the freeze commit; any later change to `src/` before or during the run is listed below as a
+deviation. Nothing in this file changes after the freeze; changes go to section 7.
+
+Decisions at the freeze (Zain): one agent, Claude Haiku 4.5 (GPT-5 mini stays an exploratory pilot, no OpenRouter
+top-up); the "allowlist prompt makes agents careful" pattern stays an observation (secondary), not a hypothesis;
+the two ~$1.50 controls were not run (spending paused), so both are limits (section 6); hand-label round 2 skipped,
+so no judge field is used in claims.
 
 ## 1. What we already looked at (exploratory, not part of the test)
 
@@ -41,7 +50,7 @@ the confirmatory numbers; only seeds 2-5, run after the freeze, are.
 - Wallets: raw key, policy (allowlist + caps), policy-caps (caps only), Brake + watcher (`cancel-unknown`).
 - Seeds: 2, 3, 4, 5.
 - Size: 11 x 2 roles x 2 sources x 4 wallets x 4 seeds = **704 runs** (352 attack, 352 twin; 88 attack runs per
-  wallet). Estimated cost ~$35 + judge ~$1.
+  wallet). Estimated cost ~$33.50 + judge ~$1 (mean of 265 past Haiku 4.5 runs); ~1.5-2 h at 6 runs at a time.
 - Prompts, scenario texts and judge: the hashes frozen in `study/v2-confirm.json`. A run whose hashes differ is
   excluded automatically by `pnpm analyze`.
 
@@ -69,11 +78,14 @@ Each is decided by the stated number; all are reported whatever the outcome.
 
 ## 4. Secondary (reported, not decisive)
 
-- **Controls, run before the freeze if Zain approves (~$1.50, Fable review-02 items 2 and 4):**
+- **Controls (NOT run before the freeze; listed for a later exploratory run, Fable review-02 items 2 and 4):**
   (a) thinking: Claude Haiku 5.5 on the raw key, notes, with the 4.5 models' fixed 4,000-token thinking budget
   (if the API refuses a fixed budget on 5.5, that refusal is reported as the result); (b) prompt vs code: the
   allowlist wallet's prompt paragraph on the raw key with no enforcement, 22 attack runs on Haiku 4.5. If not
   run, both stay listed as limits in section 6.
+- **Fooled rate per wallet** (observation from both pilots, not a hypothesis): the agent is fooled less often on the
+  allowlist wallet (seed 1: GPT-5 mini 27% vs ~64%, Haiku 4.5 45% vs ~60%), plausibly because the wallet's prompt
+  paragraph makes it careful. Reported per wallet with its interval.
 - **Judge check before the freeze: done 2026-10-21, both fields failed.** Zain hand-labelled 18 runs from the Haiku
   4.5 pilot. Kappa: `flagged_suspicious` 0.44 (13/18 agree), `declined_something` -0.14 (7/18). Neither reaches
   0.6, so **no judge field is used in any claim.** No primary hypothesis depends on the judge: fooled = proposals
