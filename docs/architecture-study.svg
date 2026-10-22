@@ -4,12 +4,12 @@
 <text x="24" y="34" font-size="20" font-weight="bold" fill="#222">3. From many runs to one published result</text>
 <rect x="30" y="70" width="230" height="100" rx="10" fill="#e7f0ff" stroke="#3b6fd8" stroke-width="2"/>
 <text x="145.0" y="99.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Matrix file</text>
-<text x="145.0" y="119.5" font-size="12.5" fill="#333" text-anchor="middle">7 attacks x attack/twin</text>
+<text x="145.0" y="119.5" font-size="12.5" fill="#333" text-anchor="middle">11 attacks x attack/twin</text>
 <text x="145.0" y="136.5" font-size="12.5" fill="#333" text-anchor="middle">x 2 sources x 4 wallets</text>
-<text x="145.0" y="153.5" font-size="12.5" fill="#333" text-anchor="middle">x 20 seeds</text>
+<text x="145.0" y="153.5" font-size="12.5" fill="#333" text-anchor="middle">x seeds; hashes frozen</text>
 <rect x="310" y="70" width="230" height="100" rx="10" fill="#e6f6ea" stroke="#2f8a4c" stroke-width="2"/>
 <text x="425.0" y="99.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Runs</text>
-<text x="425.0" y="119.5" font-size="12.5" fill="#333" text-anchor="middle">4 at once, own Anvil each</text>
+<text x="425.0" y="119.5" font-size="12.5" fill="#333" text-anchor="middle">6 at once, own Anvil each</text>
 <text x="425.0" y="136.5" font-size="12.5" fill="#333" text-anchor="middle">resumable</text>
 <text x="425.0" y="153.5" font-size="12.5" fill="#333" text-anchor="middle">stops at the USD cap</text>
 <rect x="590" y="70" width="230" height="100" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
@@ -19,24 +19,24 @@
 <rect x="860" y="70" width="230" height="100" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
 <text x="975.0" y="108.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Blind judge</text>
 <text x="975.0" y="128.0" font-size="12.5" fill="#333" text-anchor="middle">JSON verdict per run</text>
-<text x="975.0" y="145.0" font-size="12.5" fill="#333" text-anchor="middle">flagged? declined? warned?</text>
-<rect x="30" y="270" width="230" height="100" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
+<text x="975.0" y="145.0" font-size="12.5" fill="#333" text-anchor="middle">flagged? declined? aware?</text>
+<rect x="30" y="270" width="230" height="100" rx="10" fill="#fde7e7" stroke="#c43c3c" stroke-width="2"/>
 <text x="145.0" y="308.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Judge check</text>
-<text x="145.0" y="328.0" font-size="12.5" fill="#333" text-anchor="middle">seeded 10% hand-labelled</text>
-<text x="145.0" y="345.0" font-size="12.5" fill="#333" text-anchor="middle">agreement (kappa) &gt;= 0.7</text>
+<text x="145.0" y="328.0" font-size="12.5" fill="#333" text-anchor="middle">18 runs hand-labelled</text>
+<text x="145.0" y="345.0" font-size="12.5" fill="#333" text-anchor="middle">kappa 0.44: judge unused</text>
 <rect x="310" y="270" width="230" height="100" rx="10" fill="#fff4e0" stroke="#c98a1b" stroke-width="2"/>
 <text x="425.0" y="299.5" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Analyze</text>
 <text x="425.0" y="319.5" font-size="12.5" fill="#333" text-anchor="middle">leak rate with CIs</text>
 <text x="425.0" y="336.5" font-size="12.5" fill="#333" text-anchor="middle">agent fooled vs wallet</text>
-<text x="425.0" y="353.5" font-size="12.5" fill="#333" text-anchor="middle">refused vs blocked</text>
+<text x="425.0" y="353.5" font-size="12.5" fill="#333" text-anchor="middle">honest tasks not paid</text>
 <rect x="590" y="270" width="230" height="100" rx="10" fill="#f2f2f2" stroke="#666666" stroke-width="2"/>
 <text x="705.0" y="308.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Results</text>
 <text x="705.0" y="328.0" font-size="12.5" fill="#333" text-anchor="middle">docs/results/*.md</text>
 <text x="705.0" y="345.0" font-size="12.5" fill="#333" text-anchor="middle">scorecard JSON</text>
 <rect x="860" y="270" width="230" height="100" rx="10" fill="#e3f7ec" stroke="#1f8a50" stroke-width="2"/>
-<text x="975.0" y="308.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Publish if earned</text>
-<text x="975.0" y="328.0" font-size="12.5" fill="#333" text-anchor="middle">dataset, write-up</text>
-<text x="975.0" y="345.0" font-size="12.5" fill="#333" text-anchor="middle">public copy of the folder</text>
+<text x="975.0" y="308.0" font-size="15" font-weight="bold" fill="#111" text-anchor="middle">Pre-registered test</text>
+<text x="975.0" y="328.0" font-size="12.5" fill="#333" text-anchor="middle">seed 1 explores; frozen</text>
+<text x="975.0" y="345.0" font-size="12.5" fill="#333" text-anchor="middle">hashes; seeds 2-3 decide</text>
 <path d="M260,120.0 L310,120.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
 <path d="M260,320.0 L310,320.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>
 <path d="M540,120.0 L590,120.0" fill="none" stroke="#444" stroke-width="2" marker-end="url(#a)"/>

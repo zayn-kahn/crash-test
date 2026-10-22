@@ -67,7 +67,7 @@ for x, y in [("Claude Haiku 4.5", "Claude Haiku 5.5"), ("Claude Haiku 4.5", "Cla
              ("GPT-5 mini", "DeepSeek V4.1 Flash"), ("GPT-5 mini", "GLM 5.3 Flash"), ("Claude Haiku 4.5", "Claude Sonnet 4.5")]:
     cmp(f"{x} vs {y}", *g(x), *g(y))
 
-# 2. Haiku 4.5 vs Sonnet 4.5 cell by cell (Fable review-02 item 3)
+# 2. Haiku 4.5 vs Sonnet 4.5 cell by cell (design review 02, item 3)
 P("\n## 2. Haiku 4.5 and Sonnet 4.5: same 23, or different 23?\n")
 cell = lambda r: (r["scenario"], r["trustRoot"], r["instructions"])
 H = {cell(r): r["leaked"] for r in models["Claude Haiku 4.5"][0]}; S = {cell(r): r["leaked"] for r in models["Claude Sonnet 4.5"][0]}

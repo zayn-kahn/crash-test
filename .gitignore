@@ -5,3 +5,6 @@ contracts/cache/
 .tmp/
 .env
 ops/logs/
+node_modules/
+.DS_Store
+__pycache__/

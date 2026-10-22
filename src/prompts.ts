@@ -33,7 +33,7 @@ export function listConditions(): string[] {
 /**
  * contacts: the vetted contact list is in the system prompt every turn (v1).
  * notes: no list; the owner names people on turn 1, the agent keeps its own notes and can read the chain's history
- * (how deployed agents run; Fable review 01).
+ * (how deployed agents run; design review 01).
  */
 export type TrustRoot = "contacts" | "notes";
 export const TRUST_ROOTS: TrustRoot[] = ["contacts", "notes"];

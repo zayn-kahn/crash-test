@@ -18,7 +18,8 @@
     "web": "vite --config web/vite.config.ts",
     "models": "tsx scripts/models.ts",
     "check:openrouter": "tsx scripts/check-openrouter.ts",
-    "clean": "tsx scripts/clean.ts"
+    "clean": "tsx scripts/clean.ts",
+    "export:hf": "tsx scripts/export-hf.ts"
   },
   "packageManager": "pnpm@9.6.0",
   "dependencies": {

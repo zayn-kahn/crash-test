@@ -1,0 +1,3 @@
+[submodule "contracts/lib/brake"]
+	path = contracts/lib/brake
+	url = https://github.com/zayn-kahn/usebrake

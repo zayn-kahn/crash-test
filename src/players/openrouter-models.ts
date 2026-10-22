@@ -55,7 +55,7 @@ export const OPENROUTER_MODELS = [
     cacheRead: 0.006,
     priceRead: "2026-10-21",
     reasoning: { effort: "high" },
-    note: "Zain's pick (2026-10-21). Zhipu's cheap tier; reasoning mandatory.",
+    note: "The author's pick (2026-10-21). Zhipu's cheap tier; reasoning mandatory.",
   },
   {
     id: "meta-llama/llama-4-scout",

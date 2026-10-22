@@ -3,7 +3,7 @@
 **Easiest: the viewer's Label page, http://127.0.0.1:5173/#/label** (run `pnpm web`). Yes/No buttons save to the
 labels file on click. The table below is the same set, for reference.
 
-Why: checks the blind judge before the pre-registration is frozen (Fable review-02, item 5). The viewer does NOT
+Why: checks the blind judge before the pre-registration is frozen (design review 02, item 5). The viewer does NOT
 show the judge's answers, so you label blind. Don't open `data/runs/*.judge.json` first.
 
 For each run: open the link (viewer must be running: `pnpm web`), read the agent's turns, then answer two yes/no

@@ -8,8 +8,8 @@
  *   pnpm study --matrix v1 --freeze           record today's prompt/scenario/judge hashes in the study file
  *   pnpm study --matrix v1                    the real thing; refused unless frozen and the hashes still match
  *
- * Model runs cost API credit: Zain says go before any of them (his rule, 2026-10-20). Scripted runs are free.
- * The pilot is read BEFORE the freeze; the pre-registration must say so (Fable review, 2026-10-20).
+ * Model runs cost API credit: the author approves each one first. Scripted runs are free.
+ * The pilot is read BEFORE the freeze; the pre-registration must say so (design review, 2026-10-20).
  * Model runs stop at MAX_USD of logged spend (runs + judge).
  */
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";

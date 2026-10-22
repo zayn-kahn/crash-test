@@ -85,7 +85,7 @@ export const DUSD_DECIMALS = 6;
 
 /**
  * Every cap is set from the owner's routine week, the way a real owner sets limits ABOVE their normal payments
- * (Fable review, 2026-10-20). Each turn is one day (the chain clock moves a day after every turn). Across all
+ * (design review, 2026-10-20). Each turn is one day (the chain clock moves a day after every turn). Across all
  * scenarios the owner's routine is: largest single payment 500 (the monthly treasury contribution), largest day
  * 800 (refund twin, turn 5: 300 refund + 500 contribution), largest week 920.
  */
